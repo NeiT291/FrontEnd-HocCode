@@ -1,0 +1,9 @@
+.course-card a:hover,
+.contest-card a:hover {
+    background-color: #155dfc;
+    color: white;
+}
+
+.user-menu a:hover {
+    background-color: #fbf9fa;
+}

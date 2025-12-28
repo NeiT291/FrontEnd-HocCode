@@ -1,16 +1,17 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/footer/footer";
 
 const MainLayout = () => {
     return (
-        <div>
-            <header className="bg-blue-600 text-white px-6 py-4 flex gap-4">
-                <Link to="/" className="font-bold">Home</Link>
-                <Link to="/about">About</Link>
-            </header>
+        <div className="min-h-[100dvh] flex flex-col bg-gray-50">
+            <Navbar />
 
-            <main>
+            {/* CONTENT */}
+            <main className="flex-1">
                 <Outlet />
             </main>
+            <Footer />
         </div>
     );
 };

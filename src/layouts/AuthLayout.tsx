@@ -31,11 +31,13 @@ const AuthLayout = () => {
                 flex items-center justify-center mb-6
               "
                 >
-                    <img
-                        src="/logo-text.png"
-                        alt="HOCCODE Logo"
-                        className="w-[320px] object-contain"
-                    />
+                    <a href="/">
+                        <img
+                            src="/logo-text.png"
+                            alt="HOCCODE Logo"
+                            className="w-[320px] object-contain"
+                        />
+                    </a>
                 </motion.div>
                 <p className="text-lg opacity-90 max-w-md text-center">
                     Nền tảng học tập lập trình hiện đại
