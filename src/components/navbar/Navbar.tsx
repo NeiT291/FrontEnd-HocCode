@@ -37,6 +37,9 @@ const Navbar = () => {
                         <Link to="/courses" className="hover:text-blue-600 transition">
                             Khoá học
                         </Link>
+                        <Link to="/contests" className="hover:text-blue-600 transition">
+                            Cuộc thi
+                        </Link>
                         <Link to="/practice" className="hover:text-blue-600 transition">
                             Luyện tập
                         </Link>
