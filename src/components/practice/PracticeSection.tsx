@@ -1,40 +1,72 @@
-import type { Practice } from "@/types/Practice";
+import { useEffect, useState } from "react";
 import PracticeCard from "@/components/practice/PracticeCard";
+import type { Practice } from "@/types/Practice";
+import type { ProblemApi } from "@/services/api/problem.types";
+import { getAllProblems } from "@/services/api/problem.service";
 
-const practices: Practice[] = [
-    {
-        id: 1,
-        title: "Tính tổng 2 số nguyên",
-        description: "Tính tổng 2 số nguyên.",
-        createdAt: "2025-01-12",
-        createdBy: "Nguyễn Văn A",
-        difficulty: "easy",
-    },
-    {
-        id: 2,
-        title: "Tháp Hà Nội Xuôi",
-        description: "Tháp Hà Nội Xuôi.",
-        createdAt: "2025-01-08",
-        createdBy: "Trần Văn B",
-        difficulty: "medium",
-    },
-    {
-        id: 3,
-        title: "Dãy ngoặc đúng",
-        description: "Dãy ngoặc đúng.",
-        createdAt: "2024-12-25",
-        createdBy: "Lê Thị C",
-        difficulty: "hard",
-    },
-];
 const PracticeSection = () => {
+    const [practices, setPractices] = useState<Practice[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchProblems = async () => {
+            try {
+                const res = await getAllProblems(1, 6);
+
+                if (!isMounted) return;
+
+                const mapped: Practice[] = res.data.map(
+                    (problem: ProblemApi) => ({
+                        id: problem.id,
+                        title: problem.title,
+                        description: problem.description,
+                        createdAt: problem.createdAt,
+                        createdBy:
+                            problem.createdBy?.displayName ||
+                            "Giảng viên",
+                        difficulty: problem.difficulty,
+                    })
+                );
+
+                setPractices(mapped);
+            } catch (error) {
+                console.error("Fetch problems error:", error);
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchProblems();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    if (loading) {
+        return (
+            <section className="max-w-7xl mx-auto px-6 py-16">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="h-40 bg-gray-200 rounded-xl animate-pulse"
+                        />
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section className="max-w-7xl mx-auto px-6 py-16">
             {/* HEADER */}
             <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold">
-                    Luyện tập
-                </h2>
+                <h2 className="text-2xl font-bold">Luyện tập</h2>
 
                 <a
                     href="/practice"

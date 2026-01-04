@@ -18,7 +18,6 @@ const LoginPage = () => {
     const { setUser } = useAuth();
 
     useEffect(() => {
-        document.title = "Đăng nhập | HOC CODE";
         setFocus("username");
     }, []);
 
@@ -41,14 +40,6 @@ const LoginPage = () => {
                 password: data.password,
             });
 
-            /**
-             * response:
-             * {
-             *   code: 200,
-             *   message: "success",
-             *   data: { token: "abc" }
-             * }
-             */
             if (res.data.code !== 200) {
                 throw new Error(res.data.message || "Đăng nhập thất bại");
             }

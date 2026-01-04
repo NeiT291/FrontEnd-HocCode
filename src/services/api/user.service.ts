@@ -34,3 +34,31 @@ export async function getMyInfo(): Promise<UserInfo> {
 
     return res.data.data;
 }
+
+
+export interface RegisterRequest {
+    username: string;
+    password: string;
+    repassword: string;
+    display_name: string;
+    email: string;
+}
+
+interface RegisterResponse {
+    code: number;
+    message: string;
+}
+/* ================= API ================= */
+
+export async function registerUser(
+    payload: RegisterRequest
+): Promise<void> {
+    const res = await axiosInstance.post<RegisterResponse>(
+        "/users/register",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Đăng ký thất bại");
+    }
+}

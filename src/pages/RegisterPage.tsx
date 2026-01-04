@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { pageVariants, pageTransition } from "@/utils/routeAnimation";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "@/components/form/Input";
 import { useEffect, useState } from "react";
+import { registerUser } from "@/services/api/user.service";
+import toast from "react-hot-toast";
 
 type RegisterForm = {
     username: string;
@@ -14,43 +16,55 @@ type RegisterForm = {
 };
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
+
     useEffect(() => {
         document.title = "Đăng ký | HOC CODE";
         setFocus("username");
     }, []);
+
     const {
         register,
         handleSubmit,
         formState: { errors },
         setFocus,
     } = useForm<RegisterForm>({
-        mode: "onSubmit", // chỉ validate khi submit
+        mode: "onSubmit",
     });
+
     const [formError, setFormError] = useState<string | null>(null);
 
     const onSubmit = async (data: RegisterForm) => {
-        setFormError(null); // reset lỗi cũ
+        setFormError(null);
 
         try {
-            console.log("REGISTER DATA:", data);
             if (data.password !== data.repassword) {
                 throw new Error("Mật khẩu không khớp");
-                return;
-            }
-            // ❗ GIẢ LẬP LỖI TỪ BACKEND
-            if (data.username === "admin") {
-                throw new Error("Username đã tồn tại");
             }
 
-            // call API thật ở đây
+            await registerUser({
+                username: data.username,
+                password: data.password,
+                repassword: data.repassword,
+                display_name: data.fullName,
+                email: data.email,
+            });
+            toast.success(
+                "Đăng ký thành công! Đang chuyển tới trang đăng nhập..."
+            );
+            setTimeout(() => {
+                navigate("/login");
+            }, 2000);
+
         } catch (err: unknown) {
-            if (err instanceof Error) {
-                setFormError(err.message);
-            } else {
-                setFormError("Đã xảy ra lỗi, vui lòng thử lại");
-            }
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : "Đã xảy ra lỗi, vui lòng thử lại";
+            toast.error(message);
         }
     };
+
     return (
         <motion.div
             variants={pageVariants}
@@ -69,7 +83,6 @@ const RegisterPage = () => {
                     onSubmit={handleSubmit(onSubmit)}
                     className="space-y-4"
                 >
-                    {/* Username */}
                     <Input
                         label="Tên đăng nhập"
                         placeholder="Tên đăng nhập"
@@ -80,7 +93,6 @@ const RegisterPage = () => {
                         error={errors.username?.message}
                     />
 
-                    {/* Full name */}
                     <Input
                         label="Họ và tên"
                         placeholder="Họ và tên"
@@ -91,7 +103,6 @@ const RegisterPage = () => {
                         error={errors.fullName?.message}
                     />
 
-                    {/* Email */}
                     <Input
                         label="Email"
                         placeholder="Email"
@@ -107,7 +118,6 @@ const RegisterPage = () => {
                         error={errors.email?.message}
                     />
 
-                    {/* Password */}
                     <Input
                         label="Mật khẩu"
                         placeholder="••••••••"
@@ -137,11 +147,13 @@ const RegisterPage = () => {
                         })}
                         error={errors.repassword?.message}
                     />
+
                     {formError && (
                         <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
                             {formError}
                         </div>
                     )}
+
                     <button
                         type="submit"
                         className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition cursor-pointer"
@@ -149,6 +161,7 @@ const RegisterPage = () => {
                         Đăng ký
                     </button>
                 </form>
+
                 <p className="text-sm text-center mt-6">
                     Đã có tài khoản?{" "}
                     <Link to="/login" className="text-blue-600 hover:underline">
