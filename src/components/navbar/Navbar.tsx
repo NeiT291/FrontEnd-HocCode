@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom";
 import UserMenu from "@/components/navbar/UserMenu";
-
 const Navbar = () => {
-    const isAuthenticated = false;
 
-    const user = {
-        name: "Nguyễn Văn A",
-        avatar: "https://i.pravatar.cc/100?img=12",
-    };
     return (
         <header className="w-full bg-white border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center">
@@ -50,10 +44,7 @@ const Navbar = () => {
                 </div>
 
                 {/* RIGHT: AVATAR + NAME */}
-                <UserMenu
-                    isAuthenticated={isAuthenticated}
-                    user={user}
-                />
+                <UserMenu />
             </div>
         </header>
     );

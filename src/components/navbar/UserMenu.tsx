@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
     User,
     BookOpen,
@@ -8,27 +8,32 @@ import {
     UserPlus,
 } from "lucide-react";
 
-interface User {
-    name: string;
-    avatar: string;
-}
+import { logout } from "@/services/api/auth.service";
+import { useAuth } from "@/contexts/useAuth";
 
-interface UserMenuProps {
-    isAuthenticated: boolean;
-    user?: User;
-}
+const DEFAULT_AVATAR = "https://i.pravatar.cc/100?img=12";
 
-const DEFAULT_AVATAR =
-    "https://www.gravatar.com/avatar/?d=mp&f=y";
+const UserMenu = () => {
+    const navigate = useNavigate();
+    const { user, isAuthenticated, setUser } = useAuth();
 
-const UserMenu = ({ isAuthenticated, user }: UserMenuProps) => {
-    const avatarSrc = isAuthenticated && user?.avatar
-        ? user.avatar
-        : DEFAULT_AVATAR;
+    const handleLogout = async () => {
+        await logout();
+        setUser(null);              // 👉 clear user context
+        navigate("/");
+    };
 
-    const displayName = isAuthenticated && user?.name
-        ? user.name
-        : "Khách";
+    const avatarSrc =
+        isAuthenticated && user?.avatarUrl
+            ? user.avatarUrl
+            : DEFAULT_AVATAR;
+
+    const displayName =
+        isAuthenticated
+            ? user?.displayName ||
+            user?.email ||
+            "Người dùng"
+            : "Khách";
 
     return (
         <div className="relative group ml-auto user-menu">
@@ -47,19 +52,19 @@ const UserMenu = ({ isAuthenticated, user }: UserMenuProps) => {
             {/* DROPDOWN */}
             <div
                 className="
-          absolute left-0 mt-2
-          w-48
-          bg-white
-          rounded-xl
-          shadow-lg
-          border border-gray-100
-          opacity-0 invisible translate-y-2
-          group-hover:opacity-100
-          group-hover:visible
-          group-hover:translate-y-0
-          transition-all duration-200
-          z-50
-        "
+                    absolute left-0 mt-2
+                    w-48
+                    bg-white
+                    rounded-xl
+                    shadow-lg
+                    border border-gray-100
+                    opacity-0 invisible translate-y-2
+                    group-hover:opacity-100
+                    group-hover:visible
+                    group-hover:translate-y-0
+                    transition-all duration-200
+                    z-50
+                "
             >
                 {isAuthenticated ? (
                     <>
@@ -78,6 +83,7 @@ const UserMenu = ({ isAuthenticated, user }: UserMenuProps) => {
                             <BookOpen className="w-4 h-4 text-gray-400" />
                             Khóa học
                         </Link>
+
                         <Link
                             to="/classes"
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
@@ -85,7 +91,9 @@ const UserMenu = ({ isAuthenticated, user }: UserMenuProps) => {
                             <GraduationCap className="w-4 h-4 text-gray-400" />
                             Lớp học
                         </Link>
+
                         <button
+                            onClick={handleLogout}
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition cursor-pointer"
                         >
                             <LogOut className="w-4 h-4 text-red-400" />

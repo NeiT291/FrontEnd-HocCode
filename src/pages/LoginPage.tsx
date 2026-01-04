@@ -2,18 +2,26 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { pageVariants, pageTransition } from "@/utils/routeAnimation";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Input from "@/components/form/Input";
+import axiosInstance from "@/services/api/axios";
+import { getMyInfo } from "@/services/api/user.service";
+import { useAuth } from "@/contexts/useAuth";
+
 
 type LoginForm = {
     username: string;
     password: string;
 };
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const { setUser } = useAuth();
+
     useEffect(() => {
         document.title = "Đăng nhập | HOC CODE";
         setFocus("username");
     }, []);
+
     const {
         register,
         handleSubmit,
@@ -27,13 +35,33 @@ const LoginPage = () => {
         setFormError(null); // reset lỗi cũ
 
         try {
-            console.log("LOGIN DATA:", data);
-            // ❗ GIẢ LẬP LỖI TỪ BACKEND
-            if (data.username === "admin") {
-                throw new Error("Username đã tồn tại");
+            // 👉 CALL API LOGIN
+            const res = await axiosInstance.post("/auth/login", {
+                username: data.username,
+                password: data.password,
+            });
+
+            /**
+             * response:
+             * {
+             *   code: 200,
+             *   message: "success",
+             *   data: { token: "abc" }
+             * }
+             */
+            if (res.data.code !== 200) {
+                throw new Error(res.data.message || "Đăng nhập thất bại");
             }
 
-            // call API thật ở đây
+            const token = res.data.data.token;
+
+            // 👉 LƯU TOKEN
+            localStorage.setItem("access_token", token);
+            const userInfo = await getMyInfo();
+            setUser(userInfo);
+            // 👉 ĐIỀU HƯỚNG SAU KHI LOGIN
+            navigate("/");
+
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setFormError(err.message);
