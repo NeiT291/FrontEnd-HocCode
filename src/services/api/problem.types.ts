@@ -38,3 +38,8 @@ export interface ProblemListResponse {
     message: string;
     data: ProblemPageData;
 }
+export interface ProblemDetailResponse {
+    code: number;
+    message: string;
+    data: ProblemApi;
+}

@@ -20,7 +20,7 @@ const Footer = () => {
                         </div>
                         <p className="text-sm text-gray-600 max-w-sm">
                             Nền tảng học lập trình từ cơ bản đến nâng cao, cung cấp khóa học,
-                            bài tập và luyện thi online.
+                            bài tập và luyện tập online.
                         </p>
                     </div>
 
@@ -31,6 +31,11 @@ const Footer = () => {
                             <li>
                                 <Link to="/" className="hover:text-blue-600">
                                     Trang chủ
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/classes" className="hover:text-blue-600">
+                                    Lớp học
                                 </Link>
                             </li>
                             <li>
@@ -61,10 +66,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* BOTTOM */}
-                <div className="border-t border-gray-200 mt-10 pt-6 text-center text-sm text-gray-500">
-                    © {new Date().getFullYear()} HOCCODE. All rights reserved.
-                </div>
+
             </div>
         </footer>
     );

@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/api/axios";
-import type { ProblemListResponse } from "./problem.types";
+import type { ProblemListResponse, ProblemDetailResponse } from "./problem.types";
 
 export async function getAllProblems(
     page: number,
@@ -45,6 +45,20 @@ export async function searchProblems(
         throw new Error(
             res.data.message || "Search problem failed"
         );
+    }
+
+    return res.data.data;
+}
+export async function getProblemById(id: number) {
+    const res = await axiosInstance.get<ProblemDetailResponse>(
+        "/problems/get-by-id",
+        {
+            params: { id },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không lấy được bài tập");
     }
 
     return res.data.data;

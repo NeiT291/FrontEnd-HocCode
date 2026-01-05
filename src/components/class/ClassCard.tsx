@@ -1,4 +1,5 @@
-import { BookOpen, UserPlus } from "lucide-react";
+import { BookOpen, UserPlus, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Class } from "@/types/Class";
 
 interface Props {
@@ -21,7 +22,6 @@ export default function ClassCard({ classItem }: Props) {
             {/* Meta */}
             <div className="mt-4 space-y-1 text-sm text-gray-500">
                 <div>
-
                     👨‍🏫 Giảng viên:{" "}
                     <span className="text-gray-700 font-medium">
                         {classItem.instructor}
@@ -34,16 +34,33 @@ export default function ClassCard({ classItem }: Props) {
                 </div>
             </div>
 
-            {/* Action */}
-            <div className="mt-6">
+            {/* Actions */}
+            <div className="mt-6 grid grid-cols-2 gap-3">
+                {/* View detail */}
+                <Link
+                    to={`/classes/${classItem.id}`}
+                    className="
+                        flex items-center justify-center gap-2
+                        px-4 py-2 rounded-lg
+                        border border-gray-300
+                        text-sm font-medium
+                        hover:bg-gray-100
+                        transition
+                    "
+                >
+                    <Eye size={16} />
+                    Xem chi tiết
+                </Link>
+
+                {/* Join */}
                 <button
                     className="
-                        w-full flex items-center justify-center gap-2
+                        flex items-center justify-center gap-2
                         px-4 py-2 rounded-lg
                         bg-gray-900 text-white
                         text-sm font-medium
                         hover:bg-gray-800
-                        transition
+                        transition cursor-pointer
                     "
                 >
                     <UserPlus size={16} />

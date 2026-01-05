@@ -18,3 +18,27 @@ export async function getAllClasses(
 
     return res.data.data;
 }
+export async function searchClasses(
+    title: string,
+    page: number,
+    pageSize: number
+) {
+    const res = await axiosInstance.get<ClassListResponse>(
+        "/class/search",
+        {
+            params: {
+                title,
+                page,
+                pageSize,
+            },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(
+            res.data.message || "Không tìm kiếm được lớp học"
+        );
+    }
+
+    return res.data.data;
+}

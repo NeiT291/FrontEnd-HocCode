@@ -1,4 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
+import DefaultAvatar from "@/assets/default-avatar.png";
+import toast from "react-hot-toast";
 import {
     User,
     BookOpen,
@@ -11,8 +13,6 @@ import {
 import { logout } from "@/services/api/auth.service";
 import { useAuth } from "@/contexts/useAuth";
 
-const DEFAULT_AVATAR = "https://i.pravatar.cc/100?img=12";
-
 const UserMenu = () => {
     const navigate = useNavigate();
     const { user, isAuthenticated, setUser } = useAuth();
@@ -21,12 +21,13 @@ const UserMenu = () => {
         await logout();
         setUser(null);              // 👉 clear user context
         navigate("/");
+        toast.success("Đăng xuất thành công");
     };
 
     const avatarSrc =
         isAuthenticated && user?.avatarUrl
             ? user.avatarUrl
-            : DEFAULT_AVATAR;
+            : DefaultAvatar;
 
     const displayName =
         isAuthenticated
@@ -69,6 +70,13 @@ const UserMenu = () => {
                 {isAuthenticated ? (
                     <>
                         <Link
+                            to="/information"
+                            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                        >
+                            <User className="w-4 h-4 text-gray-400" />
+                            Thông tin tài khoản
+                        </Link>
+                        <Link
                             to="/profile"
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                         >
@@ -77,7 +85,7 @@ const UserMenu = () => {
                         </Link>
 
                         <Link
-                            to="/courses"
+                            to="/profile?main=joined&sub=course"
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                         >
                             <BookOpen className="w-4 h-4 text-gray-400" />
@@ -85,7 +93,7 @@ const UserMenu = () => {
                         </Link>
 
                         <Link
-                            to="/classes"
+                            to="/profile?main=joined&sub=class"
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                         >
                             <GraduationCap className="w-4 h-4 text-gray-400" />

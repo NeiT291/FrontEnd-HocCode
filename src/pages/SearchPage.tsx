@@ -9,20 +9,24 @@ import {
 import CourseCard from "@/components/course/CourseCard";
 import PracticeCard from "@/components/practice/PracticeCard";
 import ContestCard from "@/components/contest/ContestCard";
+import ClassCard from "@/components/class/ClassCard";
 
 import type { Course } from "@/types/Course";
 import type { Practice } from "@/types/Practice";
 import type { Contest } from "@/types/Contest";
+import type { Class } from "@/types/Class";
 
 import type { Course as CourseApi } from "@/services/api/course.types";
 import type { ProblemApi } from "@/services/api/problem.types";
 import type { ContestApi } from "@/services/api/contest.types";
+import type { ClassApi } from "@/services/api/class.types";
 
 import { searchCourses } from "@/services/api/course.service";
 import { searchProblems } from "@/services/api/problem.service";
 import { searchContests } from "@/services/api/contest.service";
+import { searchClasses } from "@/services/api/class.service";
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 9;
 
 export default function SearchPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -31,6 +35,7 @@ export default function SearchPage() {
     const type = searchParams.get("type") || "course";
     const page = Number(searchParams.get("page")) || 1;
 
+    const [classes, setClasses] = useState<Class[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
     const [practices, setPractices] = useState<Practice[]>([]);
     const [contests, setContests] = useState<Contest[]>([]);
@@ -47,6 +52,38 @@ export default function SearchPage() {
 
         const fetchData = async () => {
             try {
+                /* ===== SEARCH CLASS ===== */
+                if (type === "class") {
+                    const res = await searchClasses(
+                        keyword,
+                        page,
+                        PAGE_SIZE
+                    );
+
+                    if (!mounted) return;
+
+                    setClasses(
+                        res.data.map(
+                            (c: ClassApi): Class => ({
+                                id: c.id,
+                                name: c.title,
+                                description: c.description,
+                                instructor:
+                                    c.owner?.displayName ||
+                                    "Giảng viên",
+                                courseCount: c.courses?.length || 0,
+                                code: c.code
+                            })
+                        )
+                    );
+
+                    setTotalPages(res.total_pages);
+                    setTotalRecords(res.total_records);
+
+                    setCourses([]);
+                    setPractices([]);
+                    setContests([]);
+                }
                 /* ===== SEARCH COURSE ===== */
                 if (type === "course") {
                     const res = await searchCourses(
@@ -76,6 +113,7 @@ export default function SearchPage() {
 
                     setTotalPages(res.total_pages);
                     setTotalRecords(res.total_records);
+                    setClasses([]);
                     setPractices([]);
                     setContests([]);
                 }
@@ -107,6 +145,7 @@ export default function SearchPage() {
 
                     setTotalPages(res.total_pages);
                     setTotalRecords(res.total_records);
+                    setClasses([]);
                     setCourses([]);
                     setContests([]);
                 }
@@ -141,7 +180,7 @@ export default function SearchPage() {
 
                     setTotalPages(res.total_pages);
                     setTotalRecords(res.total_records);
-
+                    setClasses([]);
                     setCourses([]);
                     setPractices([]);
                 }
@@ -182,7 +221,9 @@ export default function SearchPage() {
                                 ? "Khóa học"
                                 : type === "practice"
                                     ? "Luyện tập"
-                                    : "Cuộc thi"}
+                                    : type === "contest"
+                                        ? "Cuộc thi"
+                                        : "Lớp học"}
                         </strong>
                     </p>
                 </div>
@@ -205,7 +246,8 @@ export default function SearchPage() {
                 {!loading &&
                     courses.length === 0 &&
                     practices.length === 0 &&
-                    contests.length === 0 && (
+                    contests.length === 0 &&
+                    classes.length === 0 && (
                         <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
                             <Search className="mx-auto text-gray-400 mb-4" />
                             <p className="text-gray-600">
@@ -213,7 +255,23 @@ export default function SearchPage() {
                             </p>
                         </div>
                     )}
+                {/* CLASS RESULT */}
+                {!loading && classes.length > 0 && (
+                    <>
+                        <p className="text-sm text-gray-500 mb-6">
+                            Tìm thấy {totalRecords} lớp học
+                        </p>
 
+                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                            {classes.map((c) => (
+                                <ClassCard
+                                    key={c.id}
+                                    classItem={c}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
                 {/* COURSE RESULT */}
                 {!loading && courses.length > 0 && (
                     <>

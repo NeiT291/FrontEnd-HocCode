@@ -7,6 +7,7 @@ import Input from "@/components/form/Input";
 import axiosInstance from "@/services/api/axios";
 import { getMyInfo } from "@/services/api/user.service";
 import { useAuth } from "@/contexts/useAuth";
+import toast from "react-hot-toast";
 
 
 type LoginForm = {
@@ -50,7 +51,7 @@ const LoginPage = () => {
             localStorage.setItem("access_token", token);
             const userInfo = await getMyInfo();
             setUser(userInfo);
-            // 👉 ĐIỀU HƯỚNG SAU KHI LOGIN
+            toast.success("Đăng nhập thành công");
             navigate("/");
 
         } catch (err: unknown) {

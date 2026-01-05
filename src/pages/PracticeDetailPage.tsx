@@ -1,60 +1,86 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
-import {
-    Play,
-    CheckCircle,
-    Clock,
-    Database,
-} from "lucide-react";
+import { Play, CheckCircle, Clock, Database } from "lucide-react";
+
+import { getProblemById } from "@/services/api/problem.service";
+import type { ProblemApi } from "@/services/api/problem.types";
 
 /* ================= TYPES ================= */
 
 type Difficulty = "easy" | "medium" | "hard";
 type Language = "cpp" | "java" | "python";
 
-/* ================= MOCK DATA ================= */
-
-const practice = {
-    id: 1,
-    title: "Tính tổng hai số",
-    difficulty: "easy" as Difficulty,
-    description:
-        "Viết chương trình nhập vào hai số nguyên A và B. In ra tổng của hai số đó.",
-    timeLimit: "1s",
-    memoryLimit: "256MB",
-    testCases: [
-        { input: "1 2", output: "3" },
-        { input: "10 20", output: "30" },
-    ],
-};
-
 /* ================= PAGE ================= */
 
 export default function PracticeDetailPage() {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
 
+    const [problem, setProblem] = useState<ProblemApi | null>(null);
     const [language, setLanguage] = useState<Language>("cpp");
     const [code, setCode] = useState(getTemplate("cpp"));
 
+    useEffect(() => {
+        if (!id) return;
+
+        let mounted = true;
+
+        getProblemById(Number(id))
+            .then((data) => {
+                if (mounted) setProblem(data);
+            })
+            .catch(() => {
+                if (mounted) setProblem(null);
+            });
+
+        return () => {
+            mounted = false;
+        };
+    }, [id]);
+
+    /* ================= STATE RENDER ================= */
+
+    if (!id || Number.isNaN(Number(id))) {
+        return (
+            <PageCenter>
+                <span className="text-red-500">
+                    ID bài tập không hợp lệ
+                </span>
+            </PageCenter>
+        );
+    }
+
+    if (!problem) {
+        return (
+            <PageCenter>
+                <span className="text-gray-500">
+                    Đang tải bài tập...
+                </span>
+            </PageCenter>
+        );
+    }
+
+    const timeLimit = `${problem.timeLimitMs / 1000}s`;
+    const memoryLimit = `${problem.memoryLimitKb / 1024}MB`;
+
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-6 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* ================= PROBLEM ================= */}
                     <section className="bg-white rounded-2xl shadow-sm p-8">
                         <h1 className="text-3xl font-bold text-gray-900">
-                            {practice.title}
+                            {problem.title}
                         </h1>
 
                         <div className="flex flex-wrap items-center gap-4 mt-4">
-                            <DifficultyBadge difficulty={practice.difficulty} />
-                            <Meta icon={<Clock size={14} />} text={practice.timeLimit} />
-                            <Meta icon={<Database size={14} />} text={practice.memoryLimit} />
+                            <DifficultyBadge difficulty={problem.difficulty} />
+                            <Meta icon={<Clock size={14} />} text={timeLimit} />
+                            <Meta icon={<Database size={14} />} text={memoryLimit} />
                         </div>
 
                         <p className="mt-6 text-gray-700 leading-relaxed">
-                            {practice.description}
+                            {problem.description}
                         </p>
 
                         {/* Test cases */}
@@ -64,14 +90,17 @@ export default function PracticeDetailPage() {
                             </h2>
 
                             <div className="space-y-4">
-                                {practice.testCases.map((tc, i) => (
-                                    <TestCase
-                                        key={i}
-                                        index={i + 1}
-                                        input={tc.input}
-                                        output={tc.output}
-                                    />
-                                ))}
+                                {problem.testcases
+                                    .filter((tc) => tc.isSample)
+                                    .sort((a, b) => a.position - b.position)
+                                    .map((tc, index) => (
+                                        <TestCase
+                                            key={tc.id}
+                                            index={index + 1}
+                                            input={tc.input}
+                                            output={tc.expectedOutput}
+                                        />
+                                    ))}
                             </div>
                         </div>
                     </section>
@@ -88,7 +117,7 @@ export default function PracticeDetailPage() {
                                     setCode(getTemplate(lang));
                                 }}
                                 className="border rounded-lg px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+                                focus:outline-none focus:ring-2 focus:ring-gray-900/10"
                             >
                                 <option value="cpp">C++</option>
                                 <option value="java">Java</option>
@@ -109,7 +138,7 @@ export default function PracticeDetailPage() {
                             </div>
                         </div>
 
-                        {/* Monaco Editor */}
+                        {/* Editor */}
                         <div className="flex-1 overflow-hidden rounded-b-2xl">
                             <Editor
                                 language={language}
@@ -135,6 +164,14 @@ export default function PracticeDetailPage() {
 }
 
 /* ================= UI COMPONENTS ================= */
+
+function PageCenter({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            {children}
+        </div>
+    );
+}
 
 function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
     const styles = {
@@ -247,21 +284,21 @@ function getTemplate(lang: Language) {
 using namespace std;
 
 int main() {
-  int a, b;
-  cin >> a >> b;
-  cout << a + b;
-  return 0;
+    int a, b;
+    cin >> a >> b;
+    cout << a + b;
+    return 0;
 }`;
         case "java":
             return `import java.util.*;
 
 public class Main {
-  public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    int a = sc.nextInt();
-    int b = sc.nextInt();
-    System.out.println(a + b);
-  }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        System.out.println(a + b);
+    }
 }`;
         case "python":
             return `a, b = map(int, input().split())
