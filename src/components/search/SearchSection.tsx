@@ -41,7 +41,7 @@ export default function SearchSection() {
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-6 py-14 text-center">
+            <div className="max-w-4xl mx-auto px-6 py-4 text-center">
 
                 {/* Search box */}
                 <div className="mt-10">

@@ -18,3 +18,27 @@ export async function getAllContests(
 
     return res.data.data;
 }
+export async function searchContests(
+    keyword: string,
+    page: number,
+    pageSize: number
+) {
+    const res = await axiosInstance.get<ContestListResponse>(
+        "/contest/search",
+        {
+            params: {
+                title: keyword,
+                page,
+                pageSize,
+            },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(
+            res.data.message || "Search contest failed"
+        );
+    }
+
+    return res.data.data;
+}

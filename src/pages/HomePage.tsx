@@ -5,8 +5,6 @@ import PracticeSection from "@/components/practice/PracticeSection";
 const HomePage = () => {
     return (
         <>
-
-            {/* COURSES */}
             <CourseSection />
             <ContestSection />
             <PracticeSection />
