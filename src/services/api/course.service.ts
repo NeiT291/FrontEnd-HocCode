@@ -18,7 +18,6 @@ export async function getAllCourses(
   if (res.data.code !== 200) {
     throw new Error(res.data.message || "Không lấy được danh sách khóa học");
   }
-
   return res.data.data;
 }
 export async function searchCourses(

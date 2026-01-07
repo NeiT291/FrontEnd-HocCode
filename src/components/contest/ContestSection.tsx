@@ -32,7 +32,7 @@ const ContestSection = () => {
                             id: contest.id,
                             title: contest.title,
                             description: contest.description,
-                            image:
+                            image: contest.thumbnailUrl ||
                                 "https://picsum.photos/600/400?random=" +
                                 contest.id,
                             startTime: contest.startTime,

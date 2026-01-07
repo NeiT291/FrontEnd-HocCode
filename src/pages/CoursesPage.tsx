@@ -31,8 +31,8 @@ export default function CoursesPage() {
                         id: course.id,
                         title: course.title,
                         description: course.description,
-                        image:
-                            "https://picsum.photos/1200/500?random=" +
+                        image: course.thumbnailUrl ||
+                            "https://picsum.photos/600/400?random=" +
                             course.id,
                         createdAt: course.createdAt,
                         createdBy:

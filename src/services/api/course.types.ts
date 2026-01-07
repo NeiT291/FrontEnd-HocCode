@@ -58,6 +58,7 @@ export interface Module {
 
 export interface Course {
   id: number;
+  thumbnailUrl: string | null;
   title: string;
   slug: string;
   description: string;

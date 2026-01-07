@@ -2,6 +2,7 @@ import type { UserSummary } from "@/services/api/course.types";
 
 export interface ContestApi {
     id: number;
+    thumbnailUrl: string | null;
     title: string;
     slug: string;
     description: string;

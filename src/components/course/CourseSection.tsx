@@ -22,7 +22,7 @@ const CourseSection = () => {
                         id: course.id,
                         title: course.title,
                         description: course.description,
-                        image:
+                        image: course.thumbnailUrl ||
                             "https://picsum.photos/600/400?random=" +
                             course.id,
                         createdAt: course.createdAt,

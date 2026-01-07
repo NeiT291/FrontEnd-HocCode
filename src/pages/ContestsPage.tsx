@@ -41,8 +41,8 @@ export default function ContestsPage() {
                             id: contest.id,
                             title: contest.title,
                             description: contest.description,
-                            image:
-                                "https://picsum.photos/1200/500?random=" +
+                            image: contest.thumbnailUrl ||
+                                "https://picsum.photos/600/400?random=" +
                                 contest.id,
                             startTime: contest.startTime,
                             endTime: contest.endTime,
