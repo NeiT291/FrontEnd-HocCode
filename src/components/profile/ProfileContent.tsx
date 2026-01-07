@@ -1,18 +1,35 @@
+import CreatedCourseList from "@/components/profile/lists/CreatedCourseList";
+import JoinedCourseList from "@/components/profile/lists/JoinedCourseList";
+/* ================= TYPES ================= */
+
+type MainTab = "joined" | "created";
+type SubTab = "course" | "class" | "practice" | "contest";
+
 interface Props {
-    mainTab: string;
-    subTab: string;
+    mainTab: MainTab;
+    subTab: SubTab;
 }
 
-const ProfileContent = ({ mainTab, subTab }: Props) => {
-    return (
-        <div className="bg-white rounded-2xl p-6 shadow">
-            <p className="text-gray-600">
-                Hiển thị danh sách{" "}
-                <strong>{subTab}</strong>{" "}
-                <strong>{mainTab === "joined" ? "đã tham gia" : "đã tạo"}</strong>
-            </p>
+/* ================= PAGE ================= */
 
-            {/* Sau này thay bằng list card thật */}
+const ProfileContent = ({ mainTab, subTab }: Props) => {
+    if (mainTab === "created" && subTab === "course") {
+        return <CreatedCourseList />;
+    }
+
+
+    if (mainTab === "joined" && subTab === "course") {
+        return <JoinedCourseList />;
+    }
+
+    return (
+        <div className="bg-white rounded-2xl p-6 shadow text-gray-500">
+            Hiển thị danh sách{" "}
+            <strong>{subTab}</strong>{" "}
+            <strong>
+                {mainTab === "joined" ? "đã tham gia" : "đã tạo"}
+            </strong>{" "}
+            (chưa tích hợp)
         </div>
     );
 };

@@ -4,6 +4,7 @@ import ContestCard from "@/components/contest/ContestCard";
 import type { Contest } from "@/types/Contest";
 import type { ContestApi } from "@/services/api/contest.types";
 import { getAllContests } from "@/services/api/contest.service";
+import SearchSection from "@/components/search/SearchSection";
 
 const PAGE_SIZE = 5;
 
@@ -92,80 +93,84 @@ export default function ContestsPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-6">
-            {/* Header */}
-            <div className="mb-10">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Danh sách cuộc thi
-                </h1>
-                <p className="text-gray-600 mt-2">
-                    Tổng cộng {totalRecords} cuộc thi
-                </p>
-            </div>
+        <>
+            <SearchSection />
 
-            {/* List */}
-            <div className="space-y-6">
-                {contests.map((contest) => (
-                    <ContestCard
-                        key={contest.id}
-                        contest={contest}
-                    />
-                ))}
-            </div>
+            <div className="max-w-7xl mx-auto px-6">
+                {/* Header */}
+                <div className="mb-10">
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        Danh sách cuộc thi
+                    </h1>
+                    <p className="text-gray-600 mt-2">
+                        Tổng cộng {totalRecords} cuộc thi
+                    </p>
+                </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center items-center gap-2 mt-16">
-                <button
-                    disabled={page === 1}
-                    onClick={() => goToPage(page - 1)}
-                    className="
+                {/* List */}
+                <div className="space-y-6">
+                    {contests.map((contest) => (
+                        <ContestCard
+                            key={contest.id}
+                            contest={contest}
+                        />
+                    ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex justify-center items-center gap-2 mt-16">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => goToPage(page - 1)}
+                        className="
                         px-4 py-2 rounded-lg border text-sm
                         transition-all duration-200
                         hover:bg-gray-50 hover:-translate-x-0.5
                         active:scale-95
                         disabled:opacity-40 disabled:cursor-not-allowed
                     "
-                >
-                    ← Trước
-                </button>
+                    >
+                        ← Trước
+                    </button>
 
-                {Array.from({ length: totalPages }).map((_, i) => {
-                    const p = i + 1;
-                    const active = p === page;
+                    {Array.from({ length: totalPages }).map((_, i) => {
+                        const p = i + 1;
+                        const active = p === page;
 
-                    return (
-                        <button
-                            key={p}
-                            onClick={() => goToPage(p)}
-                            className={`
+                        return (
+                            <button
+                                key={p}
+                                onClick={() => goToPage(p)}
+                                className={`
                                 w-10 h-10 rounded-lg border text-sm
                                 transition-all duration-200
                                 ${active
-                                    ? "bg-gray-900 text-white border-gray-900 scale-110 shadow-md"
-                                    : "hover:bg-gray-50 hover:scale-105"
-                                }
+                                        ? "bg-gray-900 text-white border-gray-900 scale-110 shadow-md"
+                                        : "hover:bg-gray-50 hover:scale-105"
+                                    }
                                 active:scale-95
                             `}
-                        >
-                            {p}
-                        </button>
-                    );
-                })}
+                            >
+                                {p}
+                            </button>
+                        );
+                    })}
 
-                <button
-                    disabled={page === totalPages}
-                    onClick={() => goToPage(page + 1)}
-                    className="
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => goToPage(page + 1)}
+                        className="
                         px-4 py-2 rounded-lg border text-sm
                         transition-all duration-200
                         hover:bg-gray-50 hover:translate-x-0.5
                         active:scale-95
                         disabled:opacity-40 disabled:cursor-not-allowed
                     "
-                >
-                    Sau →
-                </button>
+                    >
+                        Sau →
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

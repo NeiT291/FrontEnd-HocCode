@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/footer";
-import SearchSection from "@/components/search/SearchSection";
 
 const MainLayout = () => {
     return (
@@ -18,7 +17,6 @@ const MainLayout = () => {
                         Nền tảng học lập trình từ cơ bản đến nâng cao, có bài tập thực hành và
                         thi online.
                     </p>
-                    <SearchSection />
                 </section>
 
                 <Outlet />

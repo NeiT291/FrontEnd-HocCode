@@ -1,5 +1,5 @@
-import { useParams, Link } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import {
     BookOpen,
     Code,
@@ -11,98 +11,63 @@ import {
     Clock,
     Circle,
 } from "lucide-react";
+import { getCourseById, checkCourseJoined, enrollCourse, outCourse } from "@/services/api/course.service";
+import type { Course, Module } from "@/services/api/course.types";
+import toast from "react-hot-toast";
 
-/* ================= TYPES ================= */
+/* ================= UI TYPES ================= */
 
-type LessonType = "theory" | "practice";
 type LessonProgress = "not_started" | "in_progress" | "completed";
 
-interface Lesson {
+interface UiLesson {
     id: number;
     title: string;
-    type: LessonType;
-    progress?: LessonProgress;
+    isTheory: boolean;
+    progress: LessonProgress;
 }
-
-interface Module {
-    id: number;
-    title: string;
-    lessons: Lesson[];
-}
-
-/* ================= MOCK DATA ================= */
-
-const course = {
-    id: 1,
-    title: "Lập trình C++ cơ bản",
-    description:
-        "Khóa học giúp bạn nắm vững kiến thức nền tảng về lập trình C++ thông qua lý thuyết dễ hiểu và bài tập thực hành trực tiếp.",
-    instructor: "Nguyễn Văn A",
-    createdAt: "01/03/2025",
-    objectives: [
-        "Nắm vững cú pháp C++ cơ bản",
-        "Hiểu cấu trúc điều khiển",
-        "Giải được các bài toán cơ bản",
-    ],
-    modules: [
-        {
-            id: 1,
-            title: "Nhập môn C++",
-            lessons: [
-                {
-                    id: 1,
-                    title: "Giới thiệu C++",
-                    type: "theory",
-                    progress: "completed",
-                },
-                {
-                    id: 2,
-                    title: "Cú pháp cơ bản",
-                    type: "theory",
-                    progress: "in_progress",
-                },
-                {
-                    id: 3,
-                    title: "Bài tập cộng hai số",
-                    type: "practice",
-                    progress: "not_started",
-                },
-            ],
-        },
-        {
-            id: 2,
-            title: "Cấu trúc điều khiển",
-            lessons: [
-                {
-                    id: 4,
-                    title: "Câu lệnh if / else",
-                    type: "theory",
-                    progress: "not_started",
-                },
-                {
-                    id: 5,
-                    title: "Vòng lặp for",
-                    type: "theory",
-                    progress: "not_started",
-                },
-                {
-                    id: 6,
-                    title: "Bài tập vòng lặp",
-                    type: "practice",
-                    progress: "not_started",
-                },
-            ],
-        },
-    ] as Module[],
-};
 
 /* ================= PAGE ================= */
 
 export default function CourseDetailPage() {
-    const { id } = useParams();
-    const [joined, setJoined] = useState(false);
+    const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const courseId = Number(id);
+
+    const [course, setCourse] = useState<Course | null>(null);
+    const [joined, setJoined] = useState<boolean>(false);
+    const [checkingJoin, setCheckingJoin] = useState(true);
     const [openModules, setOpenModules] = useState<number[]>([]);
     const joinRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (Number.isNaN(courseId)) return;
+
+        getCourseById(courseId).then((data) => {
+            const modules: Module[] = data.modules
+                .sort((a, b) => a.position - b.position)
+                .map((m) => ({
+                    id: m.id,
+                    title: m.title,
+                    position: m.position,
+                    createdAt: m.createdAt,
+                    problems: m.problems ?? [],
+                }));
+
+            setCourse({
+                ...data,
+                createdAt: new Date(data.createdAt).toLocaleDateString("vi-VN"),
+                updatedAt: new Date(data.updatedAt).toLocaleDateString("vi-VN"),
+                modules,
+            });
+        });
+        checkCourseJoined(courseId)
+            .then((data) => {
+                setJoined(Boolean(data));
+            })
+            .finally(() => {
+                setCheckingJoin(false);
+            });
+    }, [courseId]);
 
     const toggleModule = (moduleId: number) => {
         setOpenModules((prev) =>
@@ -112,65 +77,110 @@ export default function CourseDetailPage() {
         );
     };
 
+    const handleJoinCourse = async () => {
+        if (localStorage.getItem("access_token") == null) {
+            navigate("/login");
+        } else {
+            try {
+                await enrollCourse(courseId);
+                setJoined(true);
+                toast.success("Tham gia khóa học thành công!");
+            } catch (e) {
+                console.error("Enroll course error:", e);
+                toast.error("Không thể tham gia khóa học. Vui lòng thử lại!");
+            }
+        }
+    };
+    const handleOutCourse = async () => {
+
+        try {
+            await outCourse(courseId);
+            setJoined(false);
+            toast.success("Rời khóa học thành công!");
+        } catch (e) {
+            console.error("Enroll course error:", e);
+            toast.error("Vui lòng thử lại!");
+        }
+
+    };
     const scrollToJoin = () => {
         joinRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    if (!course) {
+        return (
+            <div className="max-w-7xl mx-auto px-6 py-20 text-gray-500">
+                Đang tải khóa học...
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
-                {/* ================= COURSE HEADER ================= */}
+                {/* ================= HEADER ================= */}
                 <section className="bg-white rounded-2xl shadow-sm p-8">
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        {course.title}
-                    </h1>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Thumbnail */}
+                        <div className="aspect-video rounded-xl overflow-hidden bg-gray-100">
+                            {course.thumbnailUrl ? (
+                                <img
+                                    src={course.thumbnailUrl}
+                                    alt={course.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                    Không có ảnh
+                                </div>
+                            )}
+                        </div>
 
-                    <p className="mt-4 text-gray-700 max-w-3xl">
-                        {course.description}
-                    </p>
+                        {/* Info */}
+                        <div className="md:col-span-2">
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                {course.title}
+                            </h1>
 
-                    <div className="flex flex-wrap items-center gap-6 mt-4 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                            <User size={14} />
-                            Giảng viên: {course.instructor}
-                        </span>
-                        <span className="flex items-center gap-1">
-                            <GraduationCap size={14} />
-                            Ngày tạo: {course.createdAt}
-                        </span>
+                            <p className="mt-4 text-gray-700">
+                                {course.description}
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-6 mt-4 text-sm text-gray-500 mb-6">
+                                <span className="flex items-center gap-1">
+                                    <User size={14} />
+                                    Tạo bởi: {course.owner.displayName}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <GraduationCap size={14} />
+                                    Ngày tạo: {course.createdAt}
+                                </span>
+                            </div>
+
+                            {!checkingJoin && !joined && (
+                                <button
+                                    onClick={handleJoinCourse}
+                                    className="px-8 py-3 rounded-xl bg-gray-900 text-white hover:bg-gray-800 cursor-pointer"
+                                >
+                                    Tham gia học
+                                </button>
+                            )}
+
+                            {!checkingJoin && joined && (
+                                <span className="inline-flex items-center gap-2 text-green-600 text-sm font-medium">
+                                    <CheckCircle size={16} />
+                                    Bạn đã tham gia khóa học
+                                    <button
+                                        onClick={handleOutCourse}
+                                        className="px-8 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 cursor-pointer transition"
+                                    >
+                                        Bỏ học
+                                    </button>
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </section>
-
-                {/* ================= LOBBY / JOIN ================= */}
-                {!joined && (
-                    <section
-                        ref={joinRef}
-                        className="bg-white rounded-2xl shadow-sm p-8"
-                    >
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                            Bạn sẽ học được gì?
-                        </h2>
-
-                        <ul className="list-disc list-inside space-y-2 text-gray-700">
-                            {course.objectives.map((obj, i) => (
-                                <li key={i}>{obj}</li>
-                            ))}
-                        </ul>
-
-                        <div className="mt-8">
-                            <button
-                                onClick={() => setJoined(true)}
-                                className="
-                  px-8 py-3 rounded-xl
-                  bg-gray-900 text-white
-                  hover:bg-gray-800
-                "
-                            >
-                                Tham gia học
-                            </button>
-                        </div>
-                    </section>
-                )}
 
                 {/* ================= MODULES ================= */}
                 <section className="space-y-4">
@@ -182,33 +192,31 @@ export default function CourseDetailPage() {
                                 key={module.id}
                                 className="bg-white rounded-2xl shadow-sm"
                             >
-                                {/* Module header */}
                                 <button
                                     onClick={() => toggleModule(module.id)}
-                                    className="
-                    w-full flex items-center justify-between
-                    px-6 py-4 text-left
-                    hover:bg-gray-50
-                    rounded-2xl
-                  "
+                                    className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 rounded-2xl"
                                 >
-                                    <h2 className="text-lg font-semibold text-gray-900">
+                                    <h2 className="text-lg font-semibold">
                                         {module.title}
                                     </h2>
-
                                     <ChevronDown
                                         className={`transition ${isOpen ? "rotate-180" : ""
                                             }`}
                                     />
                                 </button>
 
-                                {/* Lessons */}
                                 {isOpen && (
                                     <div className="border-t">
-                                        {module.lessons.map((lesson) => (
+                                        {module.problems.map((p) => (
                                             <LessonRow
-                                                key={lesson.id}
-                                                lesson={lesson}
+                                                key={p.id}
+                                                lesson={{
+                                                    id: p.id,
+                                                    title: p.title,
+                                                    isTheory: p.isTheory,
+                                                    progress: "not_started",
+                                                }}
+                                                moduleId={module.id}
                                                 courseId={course.id}
                                                 joined={joined}
                                                 onRequireJoin={scrollToJoin}
@@ -225,40 +233,36 @@ export default function CourseDetailPage() {
     );
 }
 
-/* ================= COMPONENTS ================= */
+/* ================= LESSON ROW ================= */
 
 function LessonRow({
     lesson,
+    moduleId,
     courseId,
     joined,
     onRequireJoin,
 }: {
-    lesson: Lesson;
+    lesson: UiLesson;
+    moduleId: number;
     courseId: number;
     joined: boolean;
     onRequireJoin: () => void;
 }) {
-    const isTheory = lesson.type === "theory";
+    const isTheory = lesson.isTheory;
 
     const content = (
         <>
-            {/* Left */}
             <div className="flex items-center gap-3">
                 {isTheory ? (
                     <BookOpen size={18} className="text-blue-500" />
                 ) : (
                     <Code size={18} className="text-green-600" />
                 )}
-
-                <span
-                    className={`${joined ? "text-gray-900" : "text-gray-500"
-                        }`}
-                >
+                <span className={joined ? "text-gray-900" : "text-gray-500"}>
                     {lesson.title}
                 </span>
             </div>
 
-            {/* Right */}
             <LessonProgressBadge
                 progress={lesson.progress}
                 joined={joined}
@@ -270,11 +274,7 @@ function LessonRow({
         return (
             <button
                 onClick={onRequireJoin}
-                className="
-          w-full flex items-center justify-between
-          px-6 py-4
-          hover:bg-gray-50
-        "
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50"
             >
                 {content}
             </button>
@@ -283,17 +283,8 @@ function LessonRow({
 
     return (
         <Link
-            to={
-                isTheory
-                    ? `/courses/${courseId}/lessons/${lesson.id}`
-                    : `/practice/${lesson.id}?courseId=${courseId}`
-            }
-            className="
-        flex items-center justify-between
-        px-6 py-4
-        hover:bg-gray-50
-        transition
-      "
+            to={`/lessons/${lesson.id}?courseId=${courseId}&module=${moduleId}`}
+            className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
         >
             {content}
         </Link>
@@ -304,7 +295,7 @@ function LessonProgressBadge({
     progress,
     joined,
 }: {
-    progress?: LessonProgress;
+    progress: LessonProgress;
     joined: boolean;
 }) {
     if (!joined) {

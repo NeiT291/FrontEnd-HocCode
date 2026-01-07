@@ -16,7 +16,7 @@ export default function CodeEditor({
             height="100%"
             language={language}
             value={value}
-            theme="vs-light"
+            theme="vs-dark"
             onChange={(v) => onChange(v || "")}
             options={{
                 fontSize: 14,

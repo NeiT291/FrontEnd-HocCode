@@ -25,6 +25,7 @@ import { searchCourses } from "@/services/api/course.service";
 import { searchProblems } from "@/services/api/problem.service";
 import { searchContests } from "@/services/api/contest.service";
 import { searchClasses } from "@/services/api/class.service";
+import SearchSection from "@/components/search/SearchSection";
 
 const PAGE_SIZE = 9;
 
@@ -207,171 +208,174 @@ export default function SearchPage() {
     /* ================= UI ================= */
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-6 py-10">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        Kết quả tìm kiếm
-                    </h1>
-                    <p className="text-gray-600 mt-1">
-                        Từ khóa: <strong>{keyword}</strong> •{" "}
-                        <strong>
-                            {type === "course"
-                                ? "Khóa học"
-                                : type === "practice"
-                                    ? "Luyện tập"
-                                    : type === "contest"
-                                        ? "Cuộc thi"
-                                        : "Lớp học"}
-                        </strong>
-                    </p>
-                </div>
-
-                {/* Loading */}
-                {loading && (
-                    <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {Array.from({
-                            length: PAGE_SIZE,
-                        }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="h-56 bg-gray-200 rounded-xl animate-pulse"
-                            />
-                        ))}
+        <>
+            <SearchSection />
+            <div className="min-h-screen bg-gray-50">
+                <div className="max-w-7xl mx-auto px-6 py-10">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Kết quả tìm kiếm
+                        </h1>
+                        <p className="text-gray-600 mt-1">
+                            Từ khóa: <strong>{keyword}</strong> •{" "}
+                            <strong>
+                                {type === "course"
+                                    ? "Khóa học"
+                                    : type === "practice"
+                                        ? "Luyện tập"
+                                        : type === "contest"
+                                            ? "Cuộc thi"
+                                            : "Lớp học"}
+                            </strong>
+                        </p>
                     </div>
-                )}
 
-                {/* Empty */}
-                {!loading &&
-                    courses.length === 0 &&
-                    practices.length === 0 &&
-                    contests.length === 0 &&
-                    classes.length === 0 && (
-                        <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-                            <Search className="mx-auto text-gray-400 mb-4" />
-                            <p className="text-gray-600">
-                                Không tìm thấy kết quả phù hợp
-                            </p>
+                    {/* Loading */}
+                    {loading && (
+                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                            {Array.from({
+                                length: PAGE_SIZE,
+                            }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="h-56 bg-gray-200 rounded-xl animate-pulse"
+                                />
+                            ))}
                         </div>
                     )}
-                {/* CLASS RESULT */}
-                {!loading && classes.length > 0 && (
-                    <>
-                        <p className="text-sm text-gray-500 mb-6">
-                            Tìm thấy {totalRecords} lớp học
-                        </p>
 
-                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                            {classes.map((c) => (
-                                <ClassCard
-                                    key={c.id}
-                                    classItem={c}
-                                />
-                            ))}
-                        </div>
-                    </>
-                )}
-                {/* COURSE RESULT */}
-                {!loading && courses.length > 0 && (
-                    <>
-                        <p className="text-sm text-gray-500 mb-6">
-                            Tìm thấy {totalRecords} khóa học
-                        </p>
-                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                            {courses.map((course) => (
-                                <CourseCard
-                                    key={course.id}
-                                    course={course}
-                                />
-                            ))}
-                        </div>
-                    </>
-                )}
+                    {/* Empty */}
+                    {!loading &&
+                        courses.length === 0 &&
+                        practices.length === 0 &&
+                        contests.length === 0 &&
+                        classes.length === 0 && (
+                            <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+                                <Search className="mx-auto text-gray-400 mb-4" />
+                                <p className="text-gray-600">
+                                    Không tìm thấy kết quả phù hợp
+                                </p>
+                            </div>
+                        )}
+                    {/* CLASS RESULT */}
+                    {!loading && classes.length > 0 && (
+                        <>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Tìm thấy {totalRecords} lớp học
+                            </p>
 
-                {/* PRACTICE RESULT */}
-                {!loading && practices.length > 0 && (
-                    <>
-                        <p className="text-sm text-gray-500 mb-6">
-                            Tìm thấy {totalRecords} bài luyện tập
-                        </p>
-                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                            {practices.map((p) => (
-                                <PracticeCard
-                                    key={p.id}
-                                    practice={p}
-                                />
-                            ))}
-                        </div>
-                    </>
-                )}
-                {/* CONTEST RESULT */}
-                {!loading && contests.length > 0 && (
-                    <>
-                        <p className="text-sm text-gray-500 mb-6">
-                            Tìm thấy {totalRecords} cuộc thi
-                        </p>
+                            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                                {classes.map((c) => (
+                                    <ClassCard
+                                        key={c.id}
+                                        classItem={c}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    {/* COURSE RESULT */}
+                    {!loading && courses.length > 0 && (
+                        <>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Tìm thấy {totalRecords} khóa học
+                            </p>
+                            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                                {courses.map((course) => (
+                                    <CourseCard
+                                        key={course.id}
+                                        course={course}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
 
-                        <div className="space-y-6">
-                            {contests.map((contest) => (
-                                <ContestCard
-                                    key={contest.id}
-                                    contest={contest}
-                                />
-                            ))}
-                        </div>
-                    </>
-                )}
-                {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-2 mt-16">
-                        <button
-                            disabled={page === 1}
-                            onClick={() =>
-                                goToPage(page - 1)
-                            }
-                            className="px-3 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-40"
-                        >
-                            <ChevronLeft size={18} />
-                        </button>
+                    {/* PRACTICE RESULT */}
+                    {!loading && practices.length > 0 && (
+                        <>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Tìm thấy {totalRecords} bài luyện tập
+                            </p>
+                            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                                {practices.map((p) => (
+                                    <PracticeCard
+                                        key={p.id}
+                                        practice={p}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    {/* CONTEST RESULT */}
+                    {!loading && contests.length > 0 && (
+                        <>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Tìm thấy {totalRecords} cuộc thi
+                            </p>
 
-                        {Array.from({
-                            length: totalPages,
-                        }).map((_, i) => {
-                            const p = i + 1;
-                            const active = p === page;
+                            <div className="space-y-6">
+                                {contests.map((contest) => (
+                                    <ContestCard
+                                        key={contest.id}
+                                        contest={contest}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-2 mt-16">
+                            <button
+                                disabled={page === 1}
+                                onClick={() =>
+                                    goToPage(page - 1)
+                                }
+                                className="px-3 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-40"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
 
-                            return (
-                                <button
-                                    key={p}
-                                    onClick={() =>
-                                        goToPage(p)
-                                    }
-                                    className={`w-10 h-10 rounded-lg text-sm font-medium
-                                        ${active
-                                            ? "bg-gray-900 text-white"
-                                            : "border hover:bg-gray-50"
+                            {Array.from({
+                                length: totalPages,
+                            }).map((_, i) => {
+                                const p = i + 1;
+                                const active = p === page;
+
+                                return (
+                                    <button
+                                        key={p}
+                                        onClick={() =>
+                                            goToPage(p)
                                         }
+                                        className={`w-10 h-10 rounded-lg text-sm font-medium
+                                        ${active
+                                                ? "bg-gray-900 text-white"
+                                                : "border hover:bg-gray-50"
+                                            }
                                     `}
-                                >
-                                    {p}
-                                </button>
-                            );
-                        })}
+                                    >
+                                        {p}
+                                    </button>
+                                );
+                            })}
 
-                        <button
-                            disabled={page === totalPages}
-                            onClick={() =>
-                                goToPage(page + 1)
-                            }
-                            className="px-3 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-40"
-                        >
-                            <ChevronRight size={18} />
-                        </button>
-                    </div>
-                )}
+                            <button
+                                disabled={page === totalPages}
+                                onClick={() =>
+                                    goToPage(page + 1)
+                                }
+                                className="px-3 py-2 rounded-lg border hover:bg-gray-50 disabled:opacity-40"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

@@ -4,6 +4,7 @@ import CourseCard from "@/components/course/CourseCard";
 import type { Course } from "@/types/Course";
 import type { Course as ApiCourse } from "@/services/api/course.types";
 import { getAllCourses } from "@/services/api/course.service";
+import SearchSection from "@/components/search/SearchSection";
 
 const PAGE_SIZE = 9;
 
@@ -82,34 +83,37 @@ export default function CoursesPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-6">
-            {/* Header */}
-            <div className="mb-10">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Danh sách khóa học
-                </h1>
-                <p className="text-gray-600 mt-2">
-                    Tổng cộng {totalRecords} khóa học
-                </p>
-            </div>
+        <>
+            <SearchSection />
 
-            {/* Grid */}
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {courses.map((course) => (
-                    <CourseCard
-                        key={course.id}
-                        course={course}
-                    />
-                ))}
-            </div>
+            <div className="max-w-7xl mx-auto px-6">
+                {/* Header */}
+                <div className="mb-10">
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        Danh sách khóa học
+                    </h1>
+                    <p className="text-gray-600 mt-2">
+                        Tổng cộng {totalRecords} khóa học
+                    </p>
+                </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center items-center gap-2 mt-16">
-                {/* Previous */}
-                <button
-                    disabled={page === 1}
-                    onClick={() => goToPage(page - 1)}
-                    className="
+                {/* Grid */}
+                <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    {courses.map((course) => (
+                        <CourseCard
+                            key={course.id}
+                            course={course}
+                        />
+                    ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex justify-center items-center gap-2 mt-16">
+                    {/* Previous */}
+                    <button
+                        disabled={page === 1}
+                        onClick={() => goToPage(page - 1)}
+                        className="
                         px-4 py-2 rounded-lg border text-sm
                         transition-all duration-200
                         hover:bg-gray-50 hover:-translate-x-0.5
@@ -117,40 +121,40 @@ export default function CoursesPage() {
                         disabled:opacity-40 disabled:hover:translate-x-0
                         disabled:cursor-not-allowed
                     "
-                >
-                    ← Trước
-                </button>
+                    >
+                        ← Trước
+                    </button>
 
-                {/* Page numbers */}
-                {Array.from({ length: totalPages }).map((_, i) => {
-                    const p = i + 1;
-                    const isActive = page === p;
+                    {/* Page numbers */}
+                    {Array.from({ length: totalPages }).map((_, i) => {
+                        const p = i + 1;
+                        const isActive = page === p;
 
-                    return (
-                        <button
-                            key={p}
-                            onClick={() => goToPage(p)}
-                            className={`
+                        return (
+                            <button
+                                key={p}
+                                onClick={() => goToPage(p)}
+                                className={`
                                 w-10 h-10 rounded-lg text-sm border
                                 flex items-center justify-center
                                 transition-all duration-200
                                 ${isActive
-                                    ? "bg-gray-900 text-white border-gray-900 scale-110 shadow-md ring-2 ring-gray-900/20"
-                                    : "hover:bg-gray-50 hover:scale-105 hover:shadow-sm"
-                                }
+                                        ? "bg-gray-900 text-white border-gray-900 scale-110 shadow-md ring-2 ring-gray-900/20"
+                                        : "hover:bg-gray-50 hover:scale-105 hover:shadow-sm"
+                                    }
                                 active:scale-95
                             `}
-                        >
-                            {p}
-                        </button>
-                    );
-                })}
+                            >
+                                {p}
+                            </button>
+                        );
+                    })}
 
-                {/* Next */}
-                <button
-                    disabled={page === totalPages}
-                    onClick={() => goToPage(page + 1)}
-                    className="
+                    {/* Next */}
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => goToPage(page + 1)}
+                        className="
                         px-4 py-2 rounded-lg border text-sm
                         transition-all duration-200
                         hover:bg-gray-50 hover:translate-x-0.5
@@ -158,10 +162,11 @@ export default function CoursesPage() {
                         disabled:opacity-40 disabled:hover:translate-x-0
                         disabled:cursor-not-allowed
                     "
-                >
-                    Sau →
-                </button>
+                    >
+                        Sau →
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

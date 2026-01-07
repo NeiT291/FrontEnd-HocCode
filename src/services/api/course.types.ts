@@ -15,15 +15,6 @@ export interface UserSummary {
 
 /* ===== COURSE ===== */
 
-export interface Lesson {
-  id: number;
-  title: string;
-  content: string;
-  position: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface Testcase {
   id: number;
   input: string;
@@ -44,6 +35,7 @@ export interface Problem {
   isPublic: boolean;
   createdAt: string;
   updatedAt: string;
+  isTheory: boolean;
   testcases: Testcase[];
 }
 
@@ -52,7 +44,6 @@ export interface Module {
   title: string;
   position: number;
   createdAt: string;
-  lessons: Lesson[];
   problems: Problem[];
 }
 
@@ -85,4 +76,20 @@ export interface CourseListResponse {
   code: number;
   message: string;
   data: CoursePageData;
+}
+export interface CourseDetailResponse {
+    code: number;
+    message: string;
+    data: Course;
+}
+
+export interface CourseJoinInfo {
+    id: number;
+    enrolledAt: string;
+    progress: JSON | null;
+}
+export interface CourseEnrollInfo {
+    id: number;
+    enrolledAt: string;
+    progress: number | null;
 }

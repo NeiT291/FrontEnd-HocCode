@@ -16,6 +16,8 @@ import ClassesPage from "@/pages/ClassesPage";
 import SearchPage from "@/pages/SearchPage";
 import ProfilePage from "@/pages/ProfilePage";
 import EditProfilePage from "@/pages/EditProfilePage";
+import LessonDetailPage from "@/pages/LessonDetailPage";
+import RunCodePage from "@/pages/RunCodePage";
 
 const AppRoutes = () => {
     return (
@@ -27,16 +29,26 @@ const AppRoutes = () => {
                 </Route>
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<HomePage />} />
+
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/information" element={<EditProfilePage />} />
+
                     <Route path="/search" element={<SearchPage />} />
+
                     <Route path="/classes" element={<ClassesPage />} />
+
                     <Route path="/courses" element={<CoursesPage />} />
                     <Route path="/courses/:id" element={<CourseDetailPage />} />
+
+                    <Route path="/lessons/:id" element={<LessonDetailPage />} />
+
                     <Route path="/contests" element={<ContestsPage />} />
                     <Route path="/contests/:id" element={<ContestDetailPage />} />
+
                     <Route path="/practice" element={<PracticePage />} />
                     <Route path="/practice/:id" element={<PracticeDetailPage />} />
+
+                    <Route path="/run-code" element={<RunCodePage />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
             </Routes>
