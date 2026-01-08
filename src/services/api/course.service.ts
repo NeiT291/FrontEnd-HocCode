@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/api/axios";
-import type { CourseListResponse, CourseDetailResponse, Course, CourseJoinInfo, CourseEnrollInfo } from "@/services/api/course.types";
+import type { CourseListResponse, CourseDetailResponse, Course, CourseJoinInfo, CourseEnrollInfo, CreateCourseRequest, ApiResponse, AddCourseModuleRequest, Problem } from "@/services/api/course.types";
 
 export async function getAllCourses(
   page: number,
@@ -138,4 +138,79 @@ export async function getCoursesJoined(
     }
 
     return res.data.data.data;
+}
+export async function addCourse(
+    payload: CreateCourseRequest
+): Promise<Course> {
+    const res = await axiosInstance.post<CourseDetailResponse>(
+        "/course/add",
+        payload
+    );
+
+    return res.data.data;
+}
+export async function modifyCourse(payload: {
+    id: number;
+    title: string;
+    description: string;
+}): Promise<void> {
+    const res = await axiosInstance.put<ApiResponse>(
+        "/course/modify",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Modify course failed");
+    }
+}
+export async function setCourseThumbnail(
+    courseId: number,
+    file: File
+): Promise<string> {
+    const formData = new FormData();
+    formData.append("thumbnail", file);
+    formData.append("courseId", String(courseId));
+
+    const res = await axiosInstance.post<{
+        code: number;
+        message: string;
+        data?: { thumbnailUrl: string };
+    }>("/course/set-thumbnail", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Upload thumbnail failed");
+    }
+
+    return res.data.data?.thumbnailUrl ?? "";
+}
+
+
+export async function addCourseModule(
+    payload: AddCourseModuleRequest
+): Promise<void> {
+    const res = await axiosInstance.post<ApiResponse>(
+        "/course-module/add",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Thêm module thất bại");
+    }
+}
+
+
+export async function addProblem(
+    payload: Problem
+): Promise<void> {
+    const res = await axiosInstance.post<ApiResponse>(
+        "/problems/add",
+        payload
+    );
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Thêm module thất bại");
+    }
 }

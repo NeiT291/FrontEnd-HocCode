@@ -18,6 +18,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import EditProfilePage from "@/pages/EditProfilePage";
 import LessonDetailPage from "@/pages/LessonDetailPage";
 import RunCodePage from "@/pages/RunCodePage";
+import EditCoursePage from "@/pages/EditCoursePage";
 
 const AppRoutes = () => {
     return (
@@ -39,6 +40,7 @@ const AppRoutes = () => {
 
                     <Route path="/courses" element={<CoursesPage />} />
                     <Route path="/courses/:id" element={<CourseDetailPage />} />
+                    <Route path="/courses/:id/edit" element={<EditCoursePage />} />
 
                     <Route path="/lessons/:id" element={<LessonDetailPage />} />
 

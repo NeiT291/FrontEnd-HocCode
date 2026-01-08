@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
-import { getCoursesCreated } from "@/services/api/course.service";
+import { getCoursesCreated, addCourse } from "@/services/api/course.service";
 import type { Course } from "@/services/api/course.types";
 
 const CreatedCourseList = () => {
+    const navigate = useNavigate();
+
     const [loading, setLoading] = useState<boolean>(false);
     const [courses, setCourses] = useState<Course[]>([]);
     const [error, setError] = useState<string>("");
@@ -50,11 +52,25 @@ const CreatedCourseList = () => {
 
     const handleEdit = (id: number) => {
         console.log("Edit course:", id);
+        navigate(`/courses/${id}/edit`);
     };
 
-    const handleCreate = (title: string, description: string) => {
-        console.log("Create course:", { title, description });
-        setOpenCreate(false);
+    const handleCreate = async (title: string, description: string) => {
+        try {
+            const newCourse = await addCourse({ title, description });
+
+            setCourses((prev) => [newCourse, ...prev]);
+
+            setOpenCreate(false);
+
+            navigate(`/courses/${newCourse.id}/edit`);
+        } catch (err: unknown) {
+            alert(
+                err instanceof Error
+                    ? err.message
+                    : "Tạo khóa học thất bại"
+            );
+        }
     };
 
     /* ================= RENDER ================= */

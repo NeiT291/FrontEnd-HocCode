@@ -93,3 +93,16 @@ export interface CourseEnrollInfo {
     enrolledAt: string;
     progress: number | null;
 }
+export interface CreateCourseRequest {
+    title: string;
+    description: string;
+}
+export interface ApiResponse {
+    code: number;
+    message: string;
+}
+export interface AddCourseModuleRequest {
+    courseId: number;
+    title: string;
+    position: number;
+}
