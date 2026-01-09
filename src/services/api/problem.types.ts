@@ -43,3 +43,34 @@ export interface ProblemDetailResponse {
     message: string;
     data: ProblemApi;
 }
+export interface CreateLessonPayload {
+    title: string;
+    description: string;
+    moduleId: number;
+    timeLimitMs: number;
+    memoryLimitKb: number;
+    position: number;
+    isTheory: boolean;
+    difficulty: "easy" | "medium" | "hard";
+    testcases: {
+        input: string;
+        expectedOutput: string;
+        isSample: boolean;
+        position: number;
+    }[];
+}
+export interface ModifyLessonRequest {
+    id: number;
+    title: string;
+    description: string;
+    timeLimitMs: number;
+    memoryLimitKb: number;
+    isTheory: boolean;
+    testcases: {
+        id: number;
+        input: string;
+        expectedOutput: string;
+        position: number;
+        isSample: boolean;
+    }[];
+}

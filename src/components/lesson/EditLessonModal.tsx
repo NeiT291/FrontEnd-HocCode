@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { BookOpen, Code } from "lucide-react";
-import { createLesson } from "@/services/api/problem.service";
-
+import { deleteTestcase, modifyLesson } from "@/services/api/problem.service";
+import type { Problem } from "@/services/api/course.types";
+import { toast } from "react-hot-toast";
 /* ================= TYPES ================= */
 
 type LessonType = "THEORY" | "PRACTICE";
@@ -12,23 +13,31 @@ type TestcaseForm = {
 };
 /* ================= COMPONENT ================= */
 
-function CreateLessonModal({
-    moduleId,
+function EditLessonModal({
+    lesson,
     onClose,
     onSuccess,
 }: {
-    moduleId: number;
+    lesson: Problem;
     onClose: () => void;
     onSuccess?: () => void;
 }) {
-    const [type, setType] = useState<LessonType>("THEORY");
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [type, setType] = useState<LessonType>(
+        lesson.isTheory ? "THEORY" : "PRACTICE"
+    );
+    const [title, setTitle] = useState(lesson.title);
+    const [description, setDescription] = useState(lesson.description ?? "");
 
-    const [timeLimitMs, setTimeLimitMs] = useState(1000);
-    const [memoryLimitKb, setMemoryLimitKb] = useState(262144);
+    const [timeLimitMs, setTimeLimitMs] = useState(lesson.timeLimitMs ?? 1000);
+    const [memoryLimitKb, setMemoryLimitKb] = useState(lesson.memoryLimitKb ?? 262144);
 
-    const [testcases, setTestcases] = useState<TestcaseForm[]>([]);
+    const [testcases, setTestcases] = useState<TestcaseForm[]>(
+        (lesson.testcases ?? []).map((tc) => ({
+            id: tc.id,
+            input: tc.input,
+            expectedOutput: tc.expectedOutput,
+        }))
+    );
 
     /* ================= TESTCASE ================= */
 
@@ -56,6 +65,7 @@ function CreateLessonModal({
     };
 
     const removeTestcase = (id: number) => {
+        deleteTestcase(id);
         setTestcases((prev) => prev.filter((tc) => tc.id !== id));
     };
 
@@ -63,33 +73,31 @@ function CreateLessonModal({
 
     const handleSubmit = async () => {
         try {
-            await createLesson({
+            await modifyLesson({
+                id: lesson.id,
                 title,
                 description,
-                moduleId,
                 timeLimitMs: type === "PRACTICE" ? timeLimitMs : 0,
                 memoryLimitKb: type === "PRACTICE" ? memoryLimitKb : 0,
-                position: 0,
-                difficulty: "easy",
                 isTheory: type === "THEORY",
                 testcases:
                     type === "PRACTICE"
                         ? testcases.map((tc, index) => ({
+                            id: tc.id,
                             input: tc.input,
-                            isSample: true,
                             expectedOutput: tc.expectedOutput,
+                            isSample: true,
                             position: index,
                         }))
                         : [],
             });
 
+            toast.success("Cập nhật bài học thành công");
             onSuccess?.();
             onClose();
-
-
         } catch (error) {
             console.error(error);
-            alert("Tạo bài học thất bại");
+            toast.error("Cập nhật bài học thất bại");
         }
     };
 
@@ -102,7 +110,7 @@ function CreateLessonModal({
     return (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
             <div className="bg-white rounded-2xl w-full max-w-3xl p-6 shadow-xl space-y-6">
-                <h3 className="text-lg font-semibold">Thêm bài học</h3>
+                <h3 className="text-lg font-semibold">Chỉnh sửa bài học</h3>
 
                 {/* TYPE */}
                 <div className="grid grid-cols-2 gap-4">
@@ -232,7 +240,7 @@ function CreateLessonModal({
                         onClick={handleSubmit}
                         className="px-4 py-2 rounded-xl bg-gray-900 text-white disabled:opacity-50"
                     >
-                        Thêm bài học
+                        Sửa
                     </button>
                 </div>
             </div>
@@ -276,4 +284,4 @@ function LessonTypeCard({
     );
 }
 
-export default CreateLessonModal;
+export default EditLessonModal;

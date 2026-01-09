@@ -42,3 +42,37 @@ export async function searchClasses(
 
     return res.data.data;
 }
+export async function getClassesCreated(
+    page: number,
+    pageSize: number
+) {
+    const res = await axiosInstance.get<ClassListResponse>(
+        "/class/get-created",
+        {
+            params: { page, pageSize },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không lấy được danh sách lớp học");
+    }
+
+    return res.data.data;
+}
+export async function getClassesJoined(
+    page: number,
+    pageSize: number
+) {
+    const res = await axiosInstance.get<ClassListResponse>(
+        "/class/get-joined",
+        {
+            params: { page, pageSize },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không lấy được danh sách lớp học");
+    }
+
+    return res.data.data;
+}

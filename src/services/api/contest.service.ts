@@ -42,3 +42,38 @@ export async function searchContests(
 
     return res.data.data;
 }
+
+export async function getContestCreated(
+    page = 1,
+    pageSize = 6
+) {
+    const res = await axiosInstance.get<ContestListResponse>(
+        "/contest/get-created",
+        {
+            params: { page, pageSize },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không lấy được danh sách cuộc thi");
+    }
+
+    return res.data.data;
+}
+export async function getContestJoined(
+    page = 1,
+    pageSize = 6
+) {
+    const res = await axiosInstance.get<ContestListResponse>(
+        "/contest/get-joined",
+        {
+            params: { page, pageSize },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không lấy được danh sách cuộc thi");
+    }
+
+    return res.data.data;
+}

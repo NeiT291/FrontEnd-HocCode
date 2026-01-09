@@ -106,3 +106,8 @@ export interface AddCourseModuleRequest {
     title: string;
     position: number;
 }
+export interface ModifyCourseModuleRequest {
+    id: number;
+    courseId: number;
+    title: string;
+}

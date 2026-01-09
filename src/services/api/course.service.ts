@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/api/axios";
-import type { CourseListResponse, CourseDetailResponse, Course, CourseJoinInfo, CourseEnrollInfo, CreateCourseRequest, ApiResponse, AddCourseModuleRequest, Problem } from "@/services/api/course.types";
+import type { CourseListResponse, CourseDetailResponse, Course, CourseJoinInfo, CourseEnrollInfo, CreateCourseRequest, ApiResponse, AddCourseModuleRequest, Problem, ModifyCourseModuleRequest } from "@/services/api/course.types";
 
 export async function getAllCourses(
   page: number,
@@ -201,6 +201,18 @@ export async function addCourseModule(
         throw new Error(res.data.message || "Thêm module thất bại");
     }
 }
+export async function updateModule(
+    payload: ModifyCourseModuleRequest
+): Promise<void> {
+    const res = await axiosInstance.put<ApiResponse>(
+        "/course-module/modify",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Sửa module thất bại");
+    }
+}
 
 
 export async function addProblem(
@@ -213,4 +225,9 @@ export async function addProblem(
     if (res.data.code !== 200) {
         throw new Error(res.data.message || "Thêm module thất bại");
     }
+}
+export async function deleteModule(
+    moduleId: number
+): Promise<void> { 
+    console.log("Deleting module:", moduleId);
 }

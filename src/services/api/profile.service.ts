@@ -22,7 +22,7 @@ export async function getMyProfile(): Promise<UserProfile> {
 }
 export async function updateMyProfile(payload: UpdateProfilePayload) {
     const res = await axiosInstance.put(
-        "/users/update-profile",
+        "/users/update",
         payload
     );
 
@@ -33,16 +33,14 @@ export async function updateMyProfile(payload: UpdateProfilePayload) {
     return res.data.data;
 }
 
-
-import axios from "axios";
 export async function uploadAvatar(
     file: File
 ): Promise<{ avatarUrl: string }> {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("avatar", file);
 
-    const res = await axios.post(
-        "https://httpbin.org/post",
+    const res = await axiosInstance.post(
+        "/users/set-avatar",
         formData,
         {
             headers: {
@@ -50,7 +48,7 @@ export async function uploadAvatar(
             },
         }
     );
-    console.log("Upload response:", res.data);
+    console.log("Upload response:", res);
     return {
         avatarUrl: URL.createObjectURL(file),
     };
