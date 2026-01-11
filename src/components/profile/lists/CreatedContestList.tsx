@@ -1,48 +1,99 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Pencil, Trash2, Calendar } from "lucide-react";
+import { Plus, Pencil, Trash2, Calendar, X } from "lucide-react";
 import toast from "react-hot-toast";
-
-import { getContestCreated } from "@/services/api/contest.service";
-
+import { getContestCreated, createContest } from "@/services/api/contest.service";
+import type { ContestApi } from "@/services/api/contest.types"
 /* ================= COMPONENT ================= */
 
 export default function CreatedContestList() {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
-    const [contests, setContests] = useState<any[]>([]);
+    const [contests, setContests] = useState<ContestApi[]>([]);
     const [error, setError] = useState("");
+    /* ===== CREATE FORM STATE ===== */
 
+    const [openCreate, setOpenCreate] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const [mounted, setMounted] = useState(true);
+    const fetchContests = async () => {
+        try {
+            setLoading(true);
+            const data = await getContestCreated(1, 10);
+            if (mounted) setContests(data.data);
+        } catch (err) {
+            console.log(err)
+            setError("Không tải được danh sách cuộc thi");
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        let mounted = true;
-
-        const fetchContests = async () => {
-            try {
-                setLoading(true);
-                const data = await getContestCreated(1, 10);
-                if (mounted) setContests(data.data);
-            } catch (err) {
-                setError("Không tải được danh sách cuộc thi");
-            } finally {
-                setLoading(false);
-            }
-        };
-
+        setMounted(true);
         fetchContests();
         return () => {
-            mounted = false;
+            setMounted(false);
         };
     }, []);
 
     /* ================= ACTIONS ================= */
+    function toLocalDateTime(value: string) {
+        return value.replace("T", " ") + ":00"; // yyyy-MM-dd HH:mm:ss
+    }
+    const handleCreate = async () => {
+        if (!title.trim()) {
+            toast.error("Tiêu đề không được để trống");
+            return;
+        }
 
-    const handleEdit = (id: number) => {
-        navigate(`/contests/${id}/edit`);
+        if (!startTime || !endTime) {
+            toast.error("Vui lòng chọn thời gian");
+            return;
+        }
+
+        if (new Date(startTime) >= new Date(endTime)) {
+            toast.error("Thời gian kết thúc phải sau thời gian bắt đầu");
+            return;
+        }
+
+        if (submitting) return;
+
+        try {
+            setSubmitting(true);
+
+            const newContest = await createContest({
+                title: title.trim(),
+                description,
+                startTime: toLocalDateTime(startTime),
+                endTime: toLocalDateTime(endTime),
+            });
+
+            toast.success("Tạo cuộc thi thành công");
+
+            // reset form
+            setTitle("");
+            setDescription("");
+            setStartTime("");
+            setEndTime("");
+            setOpenCreate(false);
+            navigate(`/contests/edit/${newContest.id}`)
+            fetchContests();
+        } catch (err) {
+            console.log(err)
+            toast.error("Tạo cuộc thi thất bại");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const handleDelete = (id: number) => {
-        toast("Chức năng xóa contest chưa được triển khai");
+
         console.log("Delete contest:", id);
     };
 
@@ -78,7 +129,7 @@ export default function CreatedContestList() {
                 </div>
 
                 <button
-                    onClick={() => navigate("/contests/create")}
+                    onClick={() => setOpenCreate(true)}
                     className="
                         inline-flex items-center gap-2
                         px-5 py-2.5 rounded-xl
@@ -90,7 +141,93 @@ export default function CreatedContestList() {
                     Tạo cuộc thi
                 </button>
             </div>
+            {openCreate && (
+                <div className="border rounded-2xl p-6 space-y-4 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">
+                            Tạo cuộc thi mới
+                        </h3>
+                        <button onClick={() => setOpenCreate(false)}>
+                            <X size={18} />
+                        </button>
+                    </div>
 
+                    <div>
+                        <label className="text-sm font-medium">
+                            Tiêu đề
+                        </label>
+                        <input
+                            value={title}
+                            onChange={(e) =>
+                                setTitle(e.target.value)
+                            }
+                            className="w-full mt-1 px-4 py-2 border rounded-xl"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="text-sm font-medium">
+                            Mô tả
+                        </label>
+                        <textarea
+                            rows={3}
+                            value={description}
+                            onChange={(e) =>
+                                setDescription(e.target.value)
+                            }
+                            className="w-full mt-1 px-4 py-2 border rounded-xl resize-none"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-sm font-medium">
+                                Bắt đầu
+                            </label>
+                            <input
+                                type="datetime-local"
+                                value={startTime}
+                                onChange={(e) =>
+                                    setStartTime(e.target.value)
+                                }
+                                className="w-full mt-1 px-3 py-2 border rounded-xl"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-medium">
+                                Kết thúc
+                            </label>
+                            <input
+                                type="datetime-local"
+                                value={endTime}
+                                onChange={(e) =>
+                                    setEndTime(e.target.value)
+                                }
+                                className="w-full mt-1 px-3 py-2 border rounded-xl"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                        <button
+                            onClick={() => setOpenCreate(false)}
+                            className="px-4 py-2 rounded-xl border"
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            onClick={handleCreate}
+                            disabled={submitting}
+                            className="px-5 py-2 rounded-xl bg-gray-900 text-white disabled:opacity-50"
+                        >
+                            {submitting
+                                ? "Đang tạo..."
+                                : "Tạo"}
+                        </button>
+                    </div>
+                </div>
+            )}
             {/* EMPTY */}
             {contests.length === 0 ? (
                 <div className="text-center py-16 text-gray-500">
@@ -116,7 +253,7 @@ export default function CreatedContestList() {
                                 opacity-0 group-hover:opacity-100
                             ">
                                 <button
-                                    onClick={() => handleEdit(contest.id)}
+                                    onClick={() => navigate(`/contests/edit/${contest.id}`)}
                                     className="p-2 bg-white/90 rounded-lg"
                                 >
                                     <Pencil size={16} />

@@ -1,6 +1,6 @@
 import axiosInstance from "@/services/api/axios";
-import type { ProblemListResponse, ProblemDetailResponse, CreateLessonPayload, ModifyLessonRequest } from "./problem.types";
-import type { ApiResponse } from "./course.types";
+import type { ProblemListResponse, ProblemDetailResponse, CreateLessonPayload, ModifyLessonRequest, CreateProblemRequest, ModifyProblemRequest } from "./problem.types";
+import type { ApiResponse, Problem } from "@/services/api/course.types";
 
 export async function getAllProblems(
     page: number,
@@ -124,4 +124,37 @@ export async function getProblemsCreated(
     }
 
     return res.data.data;
+}
+export async function createProblem(
+    payload: CreateProblemRequest
+): Promise<Problem> {
+   const res = await axiosInstance.post(
+        "/problems/add",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Tạo bài tập thất bại");
+    }
+
+    return res.data.data;
+}
+export async function modifyProblem(
+    payload: ModifyProblemRequest
+): Promise<Problem> {
+   const res = await axiosInstance.put(
+        "/problems/modify",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Tạo bài tập thất bại");
+    }
+
+    return res.data.data;
+}
+export async function deleteProblem(
+    problemId: number
+){
+    console.log(problemId);
 }

@@ -74,3 +74,34 @@ export interface ModifyLessonRequest {
         isSample: boolean;
     }[];
 }
+export interface CreateProblemRequest {
+    title: string;
+    contestId?: number | null;
+    moduleId?: number | null;
+    description: string;
+    timeLimitMs: number;
+    memoryLimitKb: number;
+    difficulty: "easy" | "medium" | "hard";
+    isTheory?: boolean;
+    isPublic: boolean;
+    testcases: Array<{
+        input: string;
+        expectedOutput: string;
+        isSample: boolean;
+        active: boolean;
+    }>;
+}
+export interface ModifyProblemRequest {
+    id: number;
+    title: string;
+    description: string;
+    timeLimitMs: number;
+    memoryLimitKb: number;
+    difficulty: "easy" | "medium" | "hard";
+    isPublic: boolean;
+    testcases: Array<{
+        id?: number;
+        input: string;
+        expectedOutput: string;
+    }>;
+}

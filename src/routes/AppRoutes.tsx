@@ -19,6 +19,7 @@ import EditProfilePage from "@/pages/EditProfilePage";
 import LessonDetailPage from "@/pages/LessonDetailPage";
 import RunCodePage from "@/pages/RunCodePage";
 import EditCoursePage from "@/pages/EditCoursePage";
+import EditContestPage from "@/pages/EditContestPage";
 
 const AppRoutes = () => {
     return (
@@ -46,6 +47,8 @@ const AppRoutes = () => {
 
                     <Route path="/contests" element={<ContestsPage />} />
                     <Route path="/contests/:id" element={<ContestDetailPage />} />
+                    <Route path="/contests/edit/:id" element={<EditContestPage />} />
+
 
                     <Route path="/practice" element={<PracticePage />} />
                     <Route path="/practice/:id" element={<PracticeDetailPage />} />

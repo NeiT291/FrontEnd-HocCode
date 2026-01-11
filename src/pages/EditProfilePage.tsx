@@ -101,9 +101,6 @@ const EditProfilePage = () => {
                     <h1 className="text-3xl font-bold text-gray-900">
                         Thông tin cá nhân
                     </h1>
-                    <p className="text-gray-600 mt-1">
-                        Cập nhật thông tin để cá nhân hóa trải nghiệm của bạn
-                    </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

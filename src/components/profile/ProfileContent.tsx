@@ -48,7 +48,6 @@ const ProfileContent = ({ mainTab, subTab }: Props) => {
             <strong>
                 {mainTab === "joined" ? "đã tham gia" : "đã tạo"}
             </strong>{" "}
-            (chưa tích hợp)
         </div>
     );
 };

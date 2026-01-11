@@ -6,7 +6,7 @@ import type { ProblemApi } from "@/services/api/problem.types";
 import { getAllProblems } from "@/services/api/problem.service";
 import SearchSection from "@/components/search/SearchSection";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 9;
 type Difficulty = "easy" | "medium" | "hard";
 
 export default function PracticePage() {

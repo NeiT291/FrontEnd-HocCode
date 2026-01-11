@@ -273,7 +273,7 @@ function CreateCourseModal({
                                 focus:outline-none focus:ring-2 focus:ring-gray-900/20
                             "
                             rows={4}
-                            placeholder="Mô tả ngắn khóa học"
+                            placeholder="Mô tả khóa học"
                         />
                     </div>
                 </div>

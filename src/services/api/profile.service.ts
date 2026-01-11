@@ -1,6 +1,6 @@
 import axiosInstance from "@/services/api/axios";
-import type { UserProfile } from "@/services/api/profile.types";
-import type { UpdateProfilePayload } from "@/services/api/profile.types";
+import type { UserProfile, UpdateProfilePayload } from "@/services/api/profile.types";
+
 
 
 interface MyInfoResponse {

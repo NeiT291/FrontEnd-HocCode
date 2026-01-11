@@ -19,7 +19,7 @@ const MAIN_TABS: { key: MainTab; label: string }[] = [
 const SUB_TABS: { key: SubTab; label: string }[] = [
     { key: "course", label: "Khóa học" },
     { key: "class", label: "Lớp học" },
-    { key: "practice", label: "Practice" },
+    { key: "practice", label: "Luyện tập" },
     { key: "contest", label: "Cuộc thi" },
 ];
 
