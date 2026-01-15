@@ -1,68 +1,29 @@
-/* ===== COMMON ===== */
+import type { Problem } from "@/services/api/problem.types";
+import type { User } from "@/services/api/user.types";
 
-export interface Role {
+// ================== Request ==================
+export interface CourseRequest {
   id: number;
-  name: "USER" | "ADMIN";
-}
-
-export interface UserSummary {
-  displayName: string | null;
-  email: string | null;
-  avatarUrl: string | null;
-  active: boolean;
-  role: Role;
-}
-
-/* ===== COURSE ===== */
-
-export interface Testcase {
-  id: number;
-  input: string;
-  expectedOutput: string;
-  isSample: boolean;
-  position: number;
-}
-
-export interface Problem {
-  id: number;
+  classId: number;
   title: string;
-  slug: string;
   description: string;
-  timeLimitMs: number;
-  memoryLimitKb: number;
-  difficulty: "easy" | "medium" | "hard";
-  createdBy: UserSummary;
   isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
-  isTheory: boolean;
-  testcases: Testcase[];
-}
-
-export interface Module {
-  id: number;
-  title: string;
-  position: number;
-  createdAt: string;
-  problems: Problem[];
-}
-
-export interface Course {
-  id: number;
-  thumbnailUrl: string | null;
-  title: string;
-  slug: string;
-  description: string;
-  owner: UserSummary;
-  isPublic: boolean | null;
-  createdAt: string;
-  updatedAt: string;
   modules: Module[];
 }
-
-/* ===== PAGINATION ===== */
-
-export interface CoursePageData {
+export interface ModuleRequest {
+  id?: number;
+  courseId: number;
+  title: string;
+  position?: number;
+  problems?: Problem[];
+}
+// ================== Response ==================
+export interface CoursePageResponse {
+  code: number;
+  message: string;
+  data: CoursePage;
+}
+export interface CoursePage {
   total_records: number;
   total_records_page: number;
   current_page: number;
@@ -71,43 +32,43 @@ export interface CoursePageData {
   next_pages: number;
   data: Course[];
 }
-
-export interface CourseListResponse {
-  code: number;
-  message: string;
-  data: CoursePageData;
-}
-export interface CourseDetailResponse {
+export interface CourseResponse {
     code: number;
     message: string;
     data: Course;
 }
-
-export interface CourseJoinInfo {
-    id: number;
-    enrolledAt: string;
-    progress: JSON | null;
-}
-export interface CourseEnrollInfo {
-    id: number;
-    enrolledAt: string;
-    progress: number | null;
-}
-export interface CreateCourseRequest {
-    title: string;
-    description: string;
-}
-export interface ApiResponse {
+export interface CourseModuleResponse {
     code: number;
     message: string;
+    data: Module;
 }
-export interface AddCourseModuleRequest {
-    courseId: number;
-    title: string;
-    position: number;
+export interface CourseEnrollResponse{
+    code: number;
+    message: string;
+    data: CourseEnroll;
 }
-export interface ModifyCourseModuleRequest {
-    id: number;
-    courseId: number;
-    title: string;
+export interface Course{
+  id: number;
+  thumbnailUrl: string;
+  title: string;
+  description: string;
+  owner: User;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+  modules: Module[];
 }
+export interface Module {
+  id: number;
+  title: string;
+  position: number;
+  createdAt: string;
+  problems: Problem[];
+}
+export interface CourseEnroll{
+  id: number;
+  enrolledAt: string;
+  progress: JSON;
+}
+
+

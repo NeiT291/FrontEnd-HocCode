@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import PracticeCard from "@/components/practice/PracticeCard";
-import type { Practice } from "@/types/Practice";
-import type { ProblemApi } from "@/services/api/problem.types";
+import type { Problem } from "@/services/api/problem.types";
 import { getAllProblems } from "@/services/api/problem.service";
 
 const PracticeSection = () => {
-    const [practices, setPractices] = useState<Practice[]>([]);
+    const [problems, setProblems] = useState<Problem[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,20 +16,25 @@ const PracticeSection = () => {
 
                 if (!isMounted) return;
 
-                const mapped: Practice[] = res.data.map(
-                    (problem: ProblemApi) => ({
+                const mapped: Problem[] = res.data.map(
+                    (problem: Problem) => ({
                         id: problem.id,
                         title: problem.title,
                         description: problem.description,
-                        createdAt: problem.createdAt,
-                        createdBy:
-                            problem.createdBy?.displayName ||
-                            "Giảng viên",
+                        timeLimitMs: problem.timeLimitMs,
+                        memoryLimitKb: problem.memoryLimitKb,
                         difficulty: problem.difficulty,
+                        createdBy: problem.createdBy,
+                        isPublic: problem.isPublic,
+                        isTheory: problem.isTheory,
+                        createdAt: problem.createdAt,
+                        updatedAt: problem.updatedAt,
+                        position: problem.position,
+                        testcases: problem.testcases,
                     })
                 );
 
-                setPractices(mapped);
+                setProblems(mapped);
             } catch (error) {
                 console.error("Fetch problems error:", error);
             } finally {
@@ -77,10 +81,10 @@ const PracticeSection = () => {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {practices.map((practice) => (
+                {problems.map((problems) => (
                     <PracticeCard
-                        key={practice.id}
-                        practice={practice}
+                        key={problems.id}
+                        problem={problems}
                     />
                 ))}
             </div>

@@ -1,107 +1,59 @@
-import type { UserSummary } from "@/services/api/course.types";
+import type { User } from "@/services/api/user.types";
 
-export interface Testcase {
-    id: number;
-    input: string;
-    expectedOutput: string;
-    isSample: boolean;
-    position: number;
-}
-
-export interface ProblemApi {
+// ================== Request =====================
+export interface ProblemRequest {
     id: number;
     title: string;
-    slug: string;
     description: string;
+    contestId: number;
+    moduleId: number;
     timeLimitMs: number;
     memoryLimitKb: number;
-    difficulty: "easy" | "medium" | "hard";
-    createdBy: UserSummary;
+    difficulty: string;
     isPublic: boolean;
-    createdAt: string;
-    updatedAt: string;
+    isTheory: boolean;
     testcases: Testcase[];
 }
-
-export interface ProblemPageData {
+// ================== Response =====================
+export interface ProblemPageResponse {
+    code: number;
+    message: string;
+    data: ProblemPage;
+}
+export interface ProblemResponse {
+    code: number;
+    message: string;
+    data: Problem;
+}
+export interface ProblemPage {
     total_records: number;
     total_records_page: number;
     current_page: number;
     total_pages: number;
     prev_pages: number;
     next_pages: number;
-    data: ProblemApi[];
+    data: Problem[];
 }
-
-export interface ProblemListResponse {
-    code: number;
-    message: string;
-    data: ProblemPageData;
-}
-export interface ProblemDetailResponse {
-    code: number;
-    message: string;
-    data: ProblemApi;
-}
-export interface CreateLessonPayload {
+export interface Problem {
+    id: number;
     title: string;
     description: string;
-    moduleId: number;
     timeLimitMs: number;
     memoryLimitKb: number;
+    difficulty: "easy" | "medium" | "hard";
+    createdBy: User;
+    isPublic: boolean;
+    isTheory: boolean;
+    createdAt: string;
+    updatedAt: string;
     position: number;
-    isTheory: boolean;
-    difficulty: "easy" | "medium" | "hard";
-    testcases: {
-        input: string;
-        expectedOutput: string;
-        isSample: boolean;
-        position: number;
-    }[];
+    testcases: Testcase[];
 }
-export interface ModifyLessonRequest {
+export interface Testcase {
     id: number;
-    title: string;
-    description: string;
-    timeLimitMs: number;
-    memoryLimitKb: number;
-    isTheory: boolean;
-    testcases: {
-        id: number;
-        input: string;
-        expectedOutput: string;
-        position: number;
-        isSample: boolean;
-    }[];
-}
-export interface CreateProblemRequest {
-    title: string;
-    contestId?: number | null;
-    moduleId?: number | null;
-    description: string;
-    timeLimitMs: number;
-    memoryLimitKb: number;
-    difficulty: "easy" | "medium" | "hard";
-    isTheory?: boolean;
-    isPublic: boolean;
-    testcases: Array<{
-        input: string;
-        expectedOutput: string;
-        isSample: boolean;
-        active: boolean;
-    }>;
-}
-export interface ModifyProblemRequest {
-    id: number;
-    title: string;
-    description: string;
-    timeLimitMs: number;
-    memoryLimitKb: number;
-    difficulty: "easy" | "medium" | "hard";
-    isPublic: boolean;
-    testcases: Array<{
-        id?: number;
-        input: string;
-        expectedOutput: string;
-    }>;
+    problemId: number;
+    input: string;
+    expectedOutput: string;
+    isSample: boolean;
+    position: number;
 }

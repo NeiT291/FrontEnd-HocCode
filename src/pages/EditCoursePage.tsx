@@ -23,7 +23,8 @@ import {
     deleteModule,
 } from "@/services/api/course.service";
 import { deleteLesson } from "@/services/api/problem.service";
-import type { Course, Module, Problem } from "@/services/api/course.types";
+import type { Course, Module } from "@/services/api/course.types";
+import type { Problem } from "@/services/api/problem.types";
 import CreateLessonModal from "@/components/lesson/CreateLessonModal";
 import EditLessonModal from "@/components/lesson/EditLessonModal";
 

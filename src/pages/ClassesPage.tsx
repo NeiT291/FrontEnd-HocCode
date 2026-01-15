@@ -4,8 +4,7 @@ import { KeyRound, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ClassCard from "@/components/class/ClassCard";
 import JoinClassByCodeModal from "@/components/class/JoinClassByCodeModal";
-import type { Class } from "@/types/Class";
-import type { ClassApi } from "@/services/api/class.types";
+import type { Class } from "@/services/api/class.types";
 import { getAllClasses } from "@/services/api/class.service";
 import SearchSection from "@/components/search/SearchSection";
 
@@ -32,14 +31,15 @@ export default function ClassesPage() {
                 if (!isMounted) return;
 
                 const mapped: Class[] = res.data.map(
-                    (c: ClassApi) => ({
+                    (c: Class) => ({
                         id: c.id,
-                        name: c.title,
+                        title: c.title,
                         description: c.description,
-                        instructor:
-                            c.owner?.displayName || "Giảng viên",
-                        courseCount: c.courses.length,
+                        owner: c.owner,
                         code: c.code,
+                        courses: c.courses,
+                        createdAt: c.createdAt,
+                        enrollments: c.enrollments
                     })
                 );
 

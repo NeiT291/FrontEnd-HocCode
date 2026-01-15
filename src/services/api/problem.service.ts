@@ -1,13 +1,12 @@
-import axiosInstance from "@/services/api/axios";
-import type { ProblemListResponse, ProblemDetailResponse, CreateLessonPayload, ModifyLessonRequest, CreateProblemRequest, ModifyProblemRequest } from "./problem.types";
-import type { ApiResponse, Problem } from "@/services/api/course.types";
+import axiosInstance, { type ApiResponseNoData } from "@/services/api/axios";
+import type { ProblemPageResponse, ProblemResponse, ProblemRequest } from "@/services/api/problem.types";
 
 export async function getAllProblems(
     page: number,
     pageSize: number,
     difficulty?: "easy" | "medium" | "hard"
 ) {
-    const res = await axiosInstance.get<ProblemListResponse>(
+    const res = await axiosInstance.get<ProblemPageResponse>(
         "/problems/get-all",
         {
             params: {
@@ -31,7 +30,7 @@ export async function searchProblems(
     page: number,
     pageSize: number
 ) {
-    const res = await axiosInstance.get<ProblemListResponse>(
+    const res = await axiosInstance.get<ProblemPageResponse>(
         "/problems/search",
         {
             params: {
@@ -51,7 +50,7 @@ export async function searchProblems(
     return res.data.data;
 }
 export async function getProblemById(id: number) {
-    const res = await axiosInstance.get<ProblemDetailResponse>(
+    const res = await axiosInstance.get<ProblemResponse>(
         "/problems/get-by-id",
         {
             params: { id },
@@ -64,8 +63,8 @@ export async function getProblemById(id: number) {
 
     return res.data.data;
 }
-export async function createLesson(payload: CreateLessonPayload) {
-    const res = await axiosInstance.post<ApiResponse>(
+export async function createLesson(payload: ProblemRequest) {
+    const res = await axiosInstance.post<ProblemResponse>(
         "/problems/add",
         payload
     );
@@ -74,8 +73,8 @@ export async function createLesson(payload: CreateLessonPayload) {
         throw new Error(res.data.message || "Không tạo được bài tập");
     }
 }
-export async function modifyLesson(payload: ModifyLessonRequest) {
-    const res = await axiosInstance.put<ApiResponse>(
+export async function modifyLesson(payload: ProblemRequest) {
+    const res = await axiosInstance.put<ProblemResponse>(
         "/problems/modify",
         payload
     );
@@ -86,13 +85,13 @@ export async function modifyLesson(payload: ModifyLessonRequest) {
 }
 export async function deleteLesson(
     lessonId: number
-): Promise<void> {
+){
     console.log("Deleting lesson:", lessonId);
 }
 export async function deleteTestcase(
     id: number
-): Promise<void> {
-    const res = await axiosInstance.delete<ApiResponse>(
+){
+    const res = await axiosInstance.delete<ApiResponseNoData>(
         "/problems/delete-testcase",
         { params: { id } }
     );
@@ -106,7 +105,7 @@ export async function getProblemsCreated(
     pageSize: number,
     difficulty?: "easy" | "medium" | "hard"
 ) {
-    const res = await axiosInstance.get<ProblemListResponse>(
+    const res = await axiosInstance.get<ProblemPageResponse>(
         "/problems/get-all",
         {
             params: {
@@ -126,9 +125,9 @@ export async function getProblemsCreated(
     return res.data.data;
 }
 export async function createProblem(
-    payload: CreateProblemRequest
-): Promise<Problem> {
-   const res = await axiosInstance.post(
+    payload: ProblemRequest
+) {
+   const res = await axiosInstance.post<ProblemResponse>(
         "/problems/add",
         payload
     );
@@ -140,9 +139,9 @@ export async function createProblem(
     return res.data.data;
 }
 export async function modifyProblem(
-    payload: ModifyProblemRequest
-): Promise<Problem> {
-   const res = await axiosInstance.put(
+    payload: ProblemRequest
+) {
+   const res = await axiosInstance.put<ProblemResponse>(
         "/problems/modify",
         payload
     );

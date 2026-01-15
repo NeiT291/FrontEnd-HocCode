@@ -14,7 +14,7 @@ import {
 
 import { getProblemById } from "@/services/api/problem.service";
 import { getCourseById } from "@/services/api/course.service";
-import type { ProblemApi } from "@/services/api/problem.types";
+import type { Problem } from "@/services/api/problem.types";
 import type { Module } from "@/services/api/course.types";
 
 /* ================= TYPES ================= */
@@ -31,7 +31,7 @@ export default function LessonDetailPage() {
     const lessonId = Number(id);
     const courseId = Number(searchParams.get("courseId"));
 
-    const [problem, setProblem] = useState<ProblemApi | null>(null);
+    const [problem, setProblem] = useState<Problem | null>(null);
     const [modules, setModules] = useState<Module[]>([]);
     const [openModules, setOpenModules] = useState<number[]>([]);
 

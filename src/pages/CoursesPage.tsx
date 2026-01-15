@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CourseCard from "@/components/course/CourseCard";
-import type { Course } from "@/types/Course";
-import type { Course as ApiCourse } from "@/services/api/course.types";
+import type { Course } from "@/services/api/course.types";
 import { getAllCourses } from "@/services/api/course.service";
 import SearchSection from "@/components/search/SearchSection";
 
@@ -28,17 +27,16 @@ export default function CoursesPage() {
                 if (!isMounted) return;
 
                 const mapped: Course[] = res.data.map(
-                    (course: ApiCourse) => ({
+                    (course: Course) => ({
                         id: course.id,
+                        thumbnailUrl: course.thumbnailUrl || "https://picsum.photos/600/400?random=" + course.id,
                         title: course.title,
                         description: course.description,
-                        image: course.thumbnailUrl ||
-                            "https://picsum.photos/600/400?random=" +
-                            course.id,
+                        owner: course.owner,
+                        isPublic: course.isPublic,
                         createdAt: course.createdAt,
-                        createdBy:
-                            course.owner?.displayName ||
-                            "Giảng viên",
+                        updatedAt: course.updatedAt,
+                        modules: course.modules,
                     })
                 );
 

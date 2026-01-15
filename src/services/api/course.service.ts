@@ -1,11 +1,11 @@
 import axiosInstance from "@/services/api/axios";
-import type { CourseListResponse, CourseDetailResponse, Course, CourseJoinInfo, CourseEnrollInfo, CreateCourseRequest, ApiResponse, AddCourseModuleRequest, Problem, ModifyCourseModuleRequest } from "@/services/api/course.types";
+import type { CourseEnrollResponse, CourseModuleResponse, CoursePageResponse, CourseRequest, CourseResponse, ModuleRequest } from "@/services/api/course.types";
 
 export async function getAllCourses(
   page: number,
   pageSize: number
 ) {
-  const res = await axiosInstance.get<CourseListResponse>(
+  const res = await axiosInstance.get<CoursePageResponse>(
     "/course/get-all",
     {
       headers: {
@@ -28,7 +28,7 @@ export async function searchCourses(
   page: number,
   pageSize: number
 ) {
-  const res = await axiosInstance.get<CourseListResponse>(
+  const res = await axiosInstance.get<CoursePageResponse>(
     "/course/search",
     {
       headers: {
@@ -48,8 +48,8 @@ export async function searchCourses(
 
   return res.data.data;
 }
-export async function getCourseById(id: number): Promise<Course> {
-  const res = await axiosInstance.get<CourseDetailResponse>(
+export async function getCourseById(id: number) {
+  const res = await axiosInstance.get<CourseResponse>(
     "/course/get-by-id",
     { params: { id } }
   );
@@ -62,11 +62,11 @@ export async function getCourseById(id: number): Promise<Course> {
 }
 export async function checkCourseJoined(
   courseId: number
-): Promise<CourseJoinInfo | null> {
+) {
   const res = await axiosInstance.get<{
     code: number;
     message: string;
-    data: CourseJoinInfo | null;
+    data: CourseEnrollResponse;
   }>("/course/is-join", {
     params: { courseId },
   });
@@ -81,11 +81,11 @@ export async function checkCourseJoined(
 
 export async function enrollCourse(
     courseId: number
-): Promise<CourseEnrollInfo> {
+){
     const res = await axiosInstance.post<{
         code: number;
         message: string;
-        data: CourseEnrollInfo;
+        data: CourseEnrollResponse;
     }>("/course/enroll", null, {
         params: { courseId },
     });
@@ -98,7 +98,7 @@ export async function enrollCourse(
 }
 export async function outCourse(
     courseId: number
-): Promise<void> {
+) {
     await axiosInstance.post<{
         code: number;
     }>("/course/out-course", null, {
@@ -108,8 +108,8 @@ export async function outCourse(
 export async function getCoursesCreated(
     page: number,
     pageSize: number
-): Promise<Course[]> {
-    const res = await axiosInstance.get<CourseListResponse>(
+){
+    const res = await axiosInstance.get<CoursePageResponse>(
         "/course/get-course-created",
         {
             params: { page, pageSize },
@@ -125,8 +125,8 @@ export async function getCoursesCreated(
 export async function getCoursesJoined(
     page: number,
     pageSize: number
-): Promise<Course[]> {
-    const res = await axiosInstance.get<CourseListResponse>(
+) {
+    const res = await axiosInstance.get<CoursePageResponse>(
         "/course/get-course-joined",
         {
             params: { page, pageSize },
@@ -140,9 +140,9 @@ export async function getCoursesJoined(
     return res.data.data.data;
 }
 export async function addCourse(
-    payload: CreateCourseRequest
-): Promise<Course> {
-    const res = await axiosInstance.post<CourseDetailResponse>(
+    payload: CourseRequest
+) {
+    const res = await axiosInstance.post<CourseResponse>(
         "/course/add",
         payload
     );
@@ -153,8 +153,8 @@ export async function modifyCourse(payload: {
     id: number;
     title: string;
     description: string;
-}): Promise<void> {
-    const res = await axiosInstance.put<ApiResponse>(
+}) {
+    const res = await axiosInstance.put<CourseResponse>(
         "/course/modify",
         payload
     );
@@ -166,7 +166,7 @@ export async function modifyCourse(payload: {
 export async function setCourseThumbnail(
     courseId: number,
     file: File
-): Promise<string> {
+) {
     const formData = new FormData();
     formData.append("thumbnail", file);
     formData.append("courseId", String(courseId));
@@ -190,9 +190,9 @@ export async function setCourseThumbnail(
 
 
 export async function addCourseModule(
-    payload: AddCourseModuleRequest
-): Promise<void> {
-    const res = await axiosInstance.post<ApiResponse>(
+    payload: ModuleRequest
+){
+    const res = await axiosInstance.post<CourseModuleResponse>(
         "/course-module/add",
         payload
     );
@@ -202,9 +202,9 @@ export async function addCourseModule(
     }
 }
 export async function updateModule(
-    payload: ModifyCourseModuleRequest
-): Promise<void> {
-    const res = await axiosInstance.put<ApiResponse>(
+    payload: ModuleRequest
+) {
+    const res = await axiosInstance.put<CourseModuleResponse>(
         "/course-module/modify",
         payload
     );
@@ -214,18 +214,6 @@ export async function updateModule(
     }
 }
 
-
-export async function addProblem(
-    payload: Problem
-): Promise<void> {
-    const res = await axiosInstance.post<ApiResponse>(
-        "/problems/add",
-        payload
-    );
-    if (res.data.code !== 200) {
-        throw new Error(res.data.message || "Thêm module thất bại");
-    }
-}
 export async function deleteModule(
     moduleId: number
 ): Promise<void> { 

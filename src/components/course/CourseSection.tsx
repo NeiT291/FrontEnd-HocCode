@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CourseCard from "@/components/course/CourseCard";
-import type { Course } from "@/types/Course";
-import type { Course as ApiCourse } from "@/services/api/course.types";
+import type { Course } from "@/services/api/course.types";
 import { getAllCourses } from "@/services/api/course.service";
 
 const CourseSection = () => {
@@ -17,22 +16,21 @@ const CourseSection = () => {
 
                 if (!isMounted) return;
 
-                const mappedCourses: Course[] = res.data.map(
-                    (course: ApiCourse) => ({
+                const mapped: Course[] = res.data.map(
+                    (course: Course) => ({
                         id: course.id,
+                        thumbnailUrl: course.thumbnailUrl || "https://picsum.photos/600/400?random=" + course.id,
                         title: course.title,
                         description: course.description,
-                        image: course.thumbnailUrl ||
-                            "https://picsum.photos/600/400?random=" +
-                            course.id,
+                        owner: course.owner,
+                        isPublic: course.isPublic,
                         createdAt: course.createdAt,
-                        createdBy:
-                            course.owner?.displayName ??
-                            "Giảng viên",
+                        updatedAt: course.updatedAt,
+                        modules: course.modules,
                     })
                 );
 
-                setCourses(mappedCourses);
+                setCourses(mapped);
             } catch (error) {
                 console.error("Fetch courses error:", error);
             } finally {

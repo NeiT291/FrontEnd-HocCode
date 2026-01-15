@@ -1,13 +1,14 @@
-import type { Contest } from "@/types/Contest";
+import type { Contest } from "@/services/api/contest.types";
 
 interface Props {
     contest: Contest;
 }
+type ContestStatus = "upcoming" | "ongoing" | "ended";
 const statusMap: Record<
-    Contest["status"],
+    ContestStatus,
     {
-        label: string;
         container: string;
+        label: string;
         dot: string;
     }
 > = {
@@ -28,6 +29,7 @@ const statusMap: Record<
     },
 };
 const ContestCard = ({ contest }: Props) => {
+    const status = getStatus(contest.startTime, contest.endTime);
     return (
         <div
             key={contest.id}
@@ -48,7 +50,7 @@ const ContestCard = ({ contest }: Props) => {
         >
             {/* IMAGE */}
             <img
-                src={contest.image}
+                src={contest.thumbnailUrl}
                 alt={contest.title}
                 className="
             w-full
@@ -74,13 +76,13 @@ const ContestCard = ({ contest }: Props) => {
               px-3 py-1
               text-xs font-medium
               rounded-full
-              ${statusMap[contest.status].container}
+              ${statusMap[status].container}
             `}
                     >
                         <span
-                            className={`w-2 h-2 rounded-full ${statusMap[contest.status].dot}`}
+                            className={`w-2 h-2 rounded-full ${statusMap[status].dot}`}
                         />
-                        {statusMap[contest.status].label}
+                        {statusMap[status].label}
                     </span>
                 </div>
 
@@ -119,3 +121,13 @@ const ContestCard = ({ contest }: Props) => {
 };
 
 export default ContestCard;
+
+function getStatus(startTime: string, endTime: string): ContestStatus {
+    const now = new Date();
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (now < start) return "upcoming";
+    if (now > end) return "ended";
+    return "ongoing";
+}

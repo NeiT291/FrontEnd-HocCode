@@ -6,15 +6,15 @@ import {
     checkContestJoined,
     enrollContest
 } from "@/services/api/contest.service";
-import type { ContestDetail } from "@/services/api/contest.types";
-import type { Problem } from "@/services/api/course.types";
+import type { Contest } from "@/services/api/contest.types";
+import type { Problem } from "@/services/api/problem.types";
 
 /* ================= PAGE ================= */
 
 export default function ContestDetailPage() {
     const { id } = useParams<{ id: string }>();
 
-    const [contest, setContest] = useState<ContestDetail | null>(null);
+    const [contest, setContest] = useState<Contest | null>(null);
     const [loading, setLoading] = useState(true);
     const [joined, setJoined] = useState(false);
     const [checkingJoin, setCheckingJoin] = useState(true);

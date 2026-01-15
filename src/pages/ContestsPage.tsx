@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ContestCard from "@/components/contest/ContestCard";
-import type { Contest } from "@/types/Contest";
-import type { ContestApi } from "@/services/api/contest.types";
+import type { Contest } from "@/services/api/contest.types";
 import { getAllContests } from "@/services/api/contest.service";
 import SearchSection from "@/components/search/SearchSection";
 
@@ -28,26 +27,20 @@ export default function ContestsPage() {
                 if (!isMounted) return;
 
                 const mapped: Contest[] = res.data.map(
-                    (contest: ContestApi) => {
-                        const now = new Date();
-                        const start = new Date(contest.startTime);
-                        const end = new Date(contest.endTime);
-
-                        let status: Contest["status"];
-                        if (now < start) status = "upcoming";
-                        else if (now > end) status = "ended";
-                        else status = "ongoing";
-
+                    (contest: Contest) => {
                         return {
                             id: contest.id,
-                            title: contest.title,
-                            description: contest.description,
-                            image: contest.thumbnailUrl ||
+                            thumbnailUrl: contest.thumbnailUrl ||
                                 "https://picsum.photos/600/400?random=" +
                                 contest.id,
+                            title: contest.title,
+                            description: contest.description,
                             startTime: contest.startTime,
                             endTime: contest.endTime,
-                            status,
+                            createdBy: contest.createdBy,
+                            userEnroll: contest.userEnroll,
+                            problems: contest.problems,
+                            createdAt: contest.createdAt,
                         };
                     }
                 );

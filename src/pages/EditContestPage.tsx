@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import type { Problem } from "@/services/api/course.types";
-import type { ContestDetail } from "@/services/api/contest.types";
+import type { Problem } from "@/services/api/problem.types";
+import type { Contest } from "@/services/api/contest.types";
 import {
     getContestById,
     modifyContest,
@@ -45,7 +45,7 @@ export default function EditContestPage() {
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
 
-    const [contest, setContest] = useState<ContestDetail | null>(
+    const [contest, setContest] = useState<Contest | null>(
         null
     );
 

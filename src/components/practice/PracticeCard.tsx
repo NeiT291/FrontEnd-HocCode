@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { Calendar, User } from "lucide-react";
-import type { Practice } from "@/types/Practice";
+import type { Problem } from "@/services/api/problem.types";
 
 interface Props {
-    practice: Practice;
+    problem: Problem;
 }
 
 const difficultyMap = {
@@ -21,12 +21,12 @@ const difficultyMap = {
     },
 };
 
-const PracticeCard = ({ practice }: Props) => {
-    const difficulty = difficultyMap[practice.difficulty];
+const PracticeCard = ({ problem }: Props) => {
+    const difficulty = difficultyMap[problem.difficulty];
 
     return (
         <Link
-            to={`/practice/${practice.id}`}
+            to={`/practice/${problem.id}`}
             className="
         practice-card
         block
@@ -44,7 +44,7 @@ const PracticeCard = ({ practice }: Props) => {
             {/* HEADER */}
             <div className="flex items-start justify-between gap-2 mb-2">
                 <h3 className="text-lg font-semibold line-clamp-1">
-                    {practice.title}
+                    {problem.title}
                 </h3>
 
                 <span
@@ -61,7 +61,7 @@ const PracticeCard = ({ practice }: Props) => {
 
             {/* DESCRIPTION */}
             <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                {practice.description}
+                {problem.description}
             </p>
 
             {/* META */}
@@ -71,7 +71,7 @@ const PracticeCard = ({ practice }: Props) => {
                     <span>
                         Ngày tạo:{" "}
                         <span className="font-medium text-gray-700">
-                            {new Date(practice.createdAt).toLocaleDateString("vi-VN")}
+                            {new Date(problem.createdAt).toLocaleDateString("vi-VN")}
                         </span>
                     </span>
                 </div>
@@ -81,7 +81,7 @@ const PracticeCard = ({ practice }: Props) => {
                     <span>
                         Tác giả:{" "}
                         <span className="font-medium text-gray-700">
-                            {practice.createdBy}
+                            {problem.createdBy.displayName}
                         </span>
                     </span>
                 </div>

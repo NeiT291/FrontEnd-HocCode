@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PracticeCard from "@/components/practice/PracticeCard";
-import type { Practice } from "@/types/Practice";
-import type { ProblemApi } from "@/services/api/problem.types";
+import type { Problem } from "@/services/api/problem.types";
 import { getAllProblems } from "@/services/api/problem.service";
 import SearchSection from "@/components/search/SearchSection";
+import FilterButton from "@/components/practice/FilterButton";
 
 const PAGE_SIZE = 9;
 type Difficulty = "easy" | "medium" | "hard";
@@ -16,7 +16,7 @@ export default function PracticePage() {
     const difficulty =
         (searchParams.get("difficulty") as Difficulty) || undefined;
 
-    const [practices, setPractices] = useState<Practice[]>([]);
+    const [practices, setPractices] = useState<Problem[]>([]);
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -35,16 +35,21 @@ export default function PracticePage() {
 
                 if (!isMounted) return;
 
-                const mapped: Practice[] = res.data.map(
-                    (problem: ProblemApi) => ({
+                const mapped: Problem[] = res.data.map(
+                    (problem: Problem) => ({
                         id: problem.id,
                         title: problem.title,
                         description: problem.description,
-                        createdAt: problem.createdAt,
-                        createdBy:
-                            problem.createdBy?.displayName ||
-                            "Giảng viên",
+                        timeLimitMs: problem.timeLimitMs,
+                        memoryLimitKb: problem.memoryLimitKb,
                         difficulty: problem.difficulty,
+                        createdBy: problem.createdBy,
+                        isPublic: problem.isPublic,
+                        isTheory: problem.isTheory,
+                        createdAt: problem.createdAt,
+                        updatedAt: problem.updatedAt,
+                        position: problem.position,
+                        testcases: problem.testcases,
                     })
                 );
 
@@ -166,10 +171,10 @@ export default function PracticePage() {
 
                 {/* Grid */}
                 <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {practices.map((practice) => (
+                    {practices.map((problem) => (
                         <PracticeCard
-                            key={practice.id}
-                            practice={practice}
+                            key={problem.id}
+                            problem={problem}
                         />
                     ))}
                 </div>
@@ -236,43 +241,5 @@ export default function PracticePage() {
                 )}
             </div>
         </>
-    );
-}
-
-/* ================= Filter Button ================= */
-
-function FilterButton({
-    children,
-    active,
-    color = "gray",
-    onClick,
-}: {
-    children: React.ReactNode;
-    active: boolean;
-    color?: "gray" | "green" | "yellow" | "red";
-    onClick: () => void;
-}) {
-    const colors = {
-        gray: "border-gray-300 text-gray-700",
-        green: "border-green-500 text-green-600",
-        yellow: "border-yellow-500 text-yellow-600",
-        red: "border-red-500 text-red-600",
-    };
-
-    return (
-        <button
-            onClick={onClick}
-            className={`
-                px-4 py-2 rounded-full border text-sm
-                transition-all duration-200
-                ${active
-                    ? "bg-gray-900 text-white border-gray-900 scale-105 shadow"
-                    : `${colors[color]} hover:bg-gray-50 hover:scale-105`
-                }
-                active:scale-95
-            `}
-        >
-            {children}
-        </button>
     );
 }

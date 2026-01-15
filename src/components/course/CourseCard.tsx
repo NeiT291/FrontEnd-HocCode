@@ -1,5 +1,5 @@
 import { Calendar, User } from "lucide-react";
-import type { Course } from "@/types/Course";
+import type { Course } from "@/services/api/course.types";
 import AppLink from "@/components/common/AppLink";
 
 interface CourseCardProps {
@@ -11,7 +11,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
         <div className="course-card bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden flex flex-col">
             {/* IMAGE */}
             <img
-                src={course.image}
+                src={course.thumbnailUrl}
                 alt={course.title}
                 className="h-40 w-full object-cover"
             />
@@ -45,7 +45,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
                         <span>
                             Tác giả:{" "}
                             <span className="font-medium text-gray-700">
-                                {course.createdBy}
+                                {course.owner.displayName}
                             </span>
                         </span>
                     </div>

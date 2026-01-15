@@ -14,19 +14,9 @@ import {
 import { getCourseById, checkCourseJoined, enrollCourse, outCourse } from "@/services/api/course.service";
 import type { Course, Module } from "@/services/api/course.types";
 import toast from "react-hot-toast";
-
-/* ================= UI TYPES ================= */
+import type { Problem } from "@/services/api/problem.types";
 
 type LessonProgress = "not_started" | "in_progress" | "completed";
-
-interface UiLesson {
-    id: number;
-    title: string;
-    isTheory: boolean;
-    progress: LessonProgress;
-}
-
-/* ================= PAGE ================= */
 
 export default function CourseDetailPage() {
     const navigate = useNavigate();
@@ -54,7 +44,12 @@ export default function CourseDetailPage() {
                 }));
 
             setCourse({
-                ...data,
+                id: data.id,
+                thumbnailUrl: data.thumbnailUrl || "https://picsum.photos/600/400?random=" + data.id,
+                title: data.title,
+                description: data.description,
+                owner: data.owner,
+                isPublic: data.isPublic,
                 createdAt: new Date(data.createdAt).toLocaleDateString("vi-VN"),
                 updatedAt: new Date(data.updatedAt).toLocaleDateString("vi-VN"),
                 modules,
@@ -208,14 +203,24 @@ export default function CourseDetailPage() {
                                 {isOpen && (
                                     <div className="border-t">
                                         {module.problems.map((p) => (
-                                            <LessonRow
+                                            <ProblemRow
                                                 key={p.id}
-                                                lesson={{
+                                                problem={{
                                                     id: p.id,
                                                     title: p.title,
+                                                    description: p.description,
+                                                    timeLimitMs: p.timeLimitMs,
+                                                    memoryLimitKb: p.memoryLimitKb,
+                                                    difficulty: p.difficulty,
+                                                    createdBy: p.createdBy,
+                                                    isPublic: p.isPublic,
                                                     isTheory: p.isTheory,
-                                                    progress: "not_started",
+                                                    createdAt: p.createdAt,
+                                                    updatedAt: p.updatedAt,
+                                                    position: p.position,
+                                                    testcases: p.testcases,
                                                 }}
+                                                progress="not_started"
                                                 moduleId={module.id}
                                                 courseId={course.id}
                                                 joined={joined}
@@ -235,20 +240,22 @@ export default function CourseDetailPage() {
 
 /* ================= LESSON ROW ================= */
 
-function LessonRow({
-    lesson,
+function ProblemRow({
+    problem,
+    progress,
     moduleId,
     courseId,
     joined,
     onRequireJoin,
 }: {
-    lesson: UiLesson;
+    problem: Problem;
+    progress: LessonProgress;
     moduleId: number;
     courseId: number;
     joined: boolean;
     onRequireJoin: () => void;
 }) {
-    const isTheory = lesson.isTheory;
+    const isTheory = problem.isTheory;
 
     const content = (
         <>
@@ -259,12 +266,12 @@ function LessonRow({
                     <Code size={18} className="text-green-600" />
                 )}
                 <span className={joined ? "text-gray-900" : "text-gray-500"}>
-                    {lesson.title}
+                    {problem.title}
                 </span>
             </div>
 
             <LessonProgressBadge
-                progress={lesson.progress}
+                progress={progress}
                 joined={joined}
             />
         </>
@@ -283,7 +290,7 @@ function LessonRow({
 
     return (
         <Link
-            to={`/lessons/${lesson.id}?courseId=${courseId}&module=${moduleId}`}
+            to={`/lessons/${problem.id}?courseId=${courseId}&module=${moduleId}`}
             className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
         >
             {content}

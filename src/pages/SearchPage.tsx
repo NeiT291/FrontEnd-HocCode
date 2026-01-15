@@ -11,15 +11,10 @@ import PracticeCard from "@/components/practice/PracticeCard";
 import ContestCard from "@/components/contest/ContestCard";
 import ClassCard from "@/components/class/ClassCard";
 
-import type { Course } from "@/types/Course";
-import type { Practice } from "@/types/Practice";
-import type { Contest } from "@/types/Contest";
-import type { Class } from "@/types/Class";
-
-import type { Course as CourseApi } from "@/services/api/course.types";
-import type { ProblemApi } from "@/services/api/problem.types";
-import type { ContestApi } from "@/services/api/contest.types";
-import type { ClassApi } from "@/services/api/class.types";
+import type { Course } from "@/services/api/course.types";
+import type { Problem } from "@/services/api/problem.types";
+import type { Contest } from "@/services/api/contest.types";
+import type { Class } from "@/services/api/class.types";
 
 import { searchCourses } from "@/services/api/course.service";
 import { searchProblems } from "@/services/api/problem.service";
@@ -38,7 +33,7 @@ export default function SearchPage() {
 
     const [classes, setClasses] = useState<Class[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
-    const [practices, setPractices] = useState<Practice[]>([]);
+    const [practices, setPractices] = useState<Problem[]>([]);
     const [contests, setContests] = useState<Contest[]>([]);
 
     const [totalPages, setTotalPages] = useState(1);
@@ -65,15 +60,15 @@ export default function SearchPage() {
 
                     setClasses(
                         res.data.map(
-                            (c: ClassApi): Class => ({
+                            (c: Class): Class => ({
                                 id: c.id,
-                                name: c.title,
+                                title: c.title,
                                 description: c.description,
-                                instructor:
-                                    c.owner?.displayName ||
-                                    "Giảng viên",
-                                courseCount: c.courses?.length || 0,
-                                code: c.code
+                                owner: c.owner,
+                                code: c.code,
+                                courses: c.courses,
+                                createdAt: c.createdAt,
+                                enrollments: c.enrollments
                             })
                         )
                     );
@@ -95,22 +90,21 @@ export default function SearchPage() {
 
                     if (!mounted) return;
 
-                    setCourses(
-                        res.data.map(
-                            (c: CourseApi): Course => ({
-                                id: c.id,
-                                title: c.title,
-                                description: c.description,
-                                createdAt: c.createdAt,
-                                createdBy:
-                                    c.owner?.displayName ||
-                                    "Giảng viên",
-                                image:
-                                    "https://picsum.photos/600/400?random=" +
-                                    c.id,
-                            })
-                        )
+                    const mapped: Course[] = res.data.map(
+                        (course: Course) => ({
+                            id: course.id,
+                            thumbnailUrl: course.thumbnailUrl || "https://picsum.photos/600/400?random=" + course.id,
+                            title: course.title,
+                            description: course.description,
+                            owner: course.owner,
+                            isPublic: course.isPublic,
+                            createdAt: course.createdAt,
+                            updatedAt: course.updatedAt,
+                            modules: course.modules,
+                        })
                     );
+
+                    setCourses(mapped);
 
                     setTotalPages(res.total_pages);
                     setTotalRecords(res.total_records);
@@ -129,20 +123,25 @@ export default function SearchPage() {
 
                     if (!mounted) return;
 
-                    setPractices(
-                        res.data.map(
-                            (p: ProblemApi): Practice => ({
-                                id: p.id,
-                                title: p.title,
-                                description: p.description,
-                                createdAt: p.createdAt,
-                                createdBy:
-                                    p.createdBy?.displayName ||
-                                    "Giảng viên",
-                                difficulty: p.difficulty,
-                            })
-                        )
+                    const mapped: Problem[] = res.data.map(
+                        (problem: Problem) => ({
+                            id: problem.id,
+                            title: problem.title,
+                            description: problem.description,
+                            timeLimitMs: problem.timeLimitMs,
+                            memoryLimitKb: problem.memoryLimitKb,
+                            difficulty: problem.difficulty,
+                            createdBy: problem.createdBy,
+                            isPublic: problem.isPublic,
+                            isTheory: problem.isTheory,
+                            createdAt: problem.createdAt,
+                            updatedAt: problem.updatedAt,
+                            position: problem.position,
+                            testcases: problem.testcases,
+                        })
                     );
+
+                    setPractices(mapped);
 
                     setTotalPages(res.total_pages);
                     setTotalRecords(res.total_records);
@@ -160,24 +159,26 @@ export default function SearchPage() {
 
                     if (!mounted) return;
 
-                    setContests(
-                        res.data.map(
-                            (c: ContestApi): Contest => ({
-                                id: c.id,
-                                title: c.title,
-                                description: c.description,
-                                startTime: c.startTime,
-                                endTime: c.endTime,
-                                image:
+                    const mapped: Contest[] = res.data.map(
+                        (contest: Contest) => {
+                            return {
+                                id: contest.id,
+                                thumbnailUrl: contest.thumbnailUrl ||
                                     "https://picsum.photos/600/400?random=" +
-                                    c.id,
-                                status: getContestStatus(
-                                    c.startTime,
-                                    c.endTime
-                                ),
-                            })
-                        )
+                                    contest.id,
+                                title: contest.title,
+                                description: contest.description,
+                                startTime: contest.startTime,
+                                endTime: contest.endTime,
+                                createdBy: contest.createdBy,
+                                userEnroll: contest.userEnroll,
+                                problems: contest.problems,
+                                createdAt: contest.createdAt,
+                            };
+                        }
                     );
+
+                    setContests(mapped);
 
                     setTotalPages(res.total_pages);
                     setTotalRecords(res.total_records);
@@ -302,7 +303,7 @@ export default function SearchPage() {
                                 {practices.map((p) => (
                                     <PracticeCard
                                         key={p.id}
-                                        practice={p}
+                                        problem={p}
                                     />
                                 ))}
                             </div>
@@ -378,17 +379,3 @@ export default function SearchPage() {
         </>
     );
 };
-
-
-function getContestStatus(
-    startTime: string,
-    endTime: string
-): "upcoming" | "ongoing" | "ended" {
-    const now = new Date();
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-
-    if (now < start) return "upcoming";
-    if (now > end) return "ended";
-    return "ongoing";
-}

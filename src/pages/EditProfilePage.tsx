@@ -1,42 +1,45 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultAvatar from "@/assets/default-avatar.png";
+import FieldUpdateUser from "@/components/form/FieldUpdateUser"
 import toast from "react-hot-toast";
 import {
-    getMyProfile,
+    getMyInfo,
     updateMyProfile,
     uploadAvatar,
-} from "@/services/api/profile.service";
+} from "@/services/api/user.service";
 import type {
-    UserProfile,
-    UpdateProfilePayload,
-} from "@/services/api/profile.types";
+    User,
+    UpdateUserRequest,
+} from "@/services/api/user.types";
 
 const EditProfilePage = () => {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [profile, setProfile] = useState<User | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-    const [form, setForm] = useState<UpdateProfilePayload>({
+    const [form, setForm] = useState<UpdateUserRequest>({
         displayName: "",
         bio: "",
         dob: "",
+        email: "",
         phone: "",
         address: "",
     });
 
     /* ================= LOAD PROFILE ================= */
     useEffect(() => {
-        getMyProfile().then((data) => {
+        getMyInfo().then((data) => {
             setProfile(data);
             setForm({
                 displayName: data.displayName || "",
                 bio: data.bio || "",
                 dob: data.dob || "",
+                email: data.email || "",
                 phone: data.phone || "",
                 address: data.address || "",
             });
@@ -155,7 +158,7 @@ const EditProfilePage = () => {
 
                     {/* ================= FORM CARD ================= */}
                     <div className="md:col-span-2 bg-white rounded-2xl shadow p-8 space-y-6">
-                        <Field label="Tên hiển thị">
+                        <FieldUpdateUser label="Tên hiển thị">
                             <input
                                 name="displayName"
                                 value={form.displayName}
@@ -163,9 +166,9 @@ const EditProfilePage = () => {
                                 placeholder="Nhập tên hiển thị"
                                 className={inputClass}
                             />
-                        </Field>
+                        </FieldUpdateUser>
 
-                        <Field label="Giới thiệu">
+                        <FieldUpdateUser label="Giới thiệu">
                             <textarea
                                 name="bio"
                                 value={form.bio}
@@ -174,10 +177,17 @@ const EditProfilePage = () => {
                                 placeholder="Viết vài dòng giới thiệu về bạn"
                                 className={inputClass}
                             />
-                        </Field>
-
+                        </FieldUpdateUser>
+                        <FieldUpdateUser label="Email">
+                            <input
+                                name="Email"
+                                value={form.email}
+                                readOnly
+                                className={inputClass + "bg-gray-200"}
+                            />
+                        </FieldUpdateUser>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <Field label="Ngày sinh">
+                            <FieldUpdateUser label="Ngày sinh">
                                 <input
                                     type="date"
                                     name="dob"
@@ -185,9 +195,9 @@ const EditProfilePage = () => {
                                     onChange={handleChange}
                                     className={inputClass}
                                 />
-                            </Field>
+                            </FieldUpdateUser>
 
-                            <Field label="Số điện thoại">
+                            <FieldUpdateUser label="Số điện thoại">
                                 <input
                                     name="phone"
                                     value={form.phone}
@@ -195,10 +205,10 @@ const EditProfilePage = () => {
                                     placeholder="0123456789"
                                     className={inputClass}
                                 />
-                            </Field>
+                            </FieldUpdateUser>
                         </div>
 
-                        <Field label="Địa chỉ">
+                        <FieldUpdateUser label="Địa chỉ">
                             <input
                                 name="address"
                                 value={form.address}
@@ -206,7 +216,7 @@ const EditProfilePage = () => {
                                 placeholder="Hà Nội"
                                 className={inputClass}
                             />
-                        </Field>
+                        </FieldUpdateUser>
 
                         {/* ================= ACTIONS ================= */}
                         <div className="flex justify-end gap-3 pt-6 border-t">
@@ -243,7 +253,6 @@ const EditProfilePage = () => {
 
 export default EditProfilePage;
 
-/* ================= SMALL UI ================= */
 
 const inputClass = `
 w-full rounded-xl border border-gray-300
@@ -252,17 +261,4 @@ focus:outline-none focus:ring-2 focus:ring-blue-500/30
 transition
 `;
 
-const Field = ({
-    label,
-    children,
-}: {
-    label: string;
-    children: React.ReactNode;
-}) => (
-    <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
-            {label}
-        </label>
-        {children}
-    </div>
-);
+

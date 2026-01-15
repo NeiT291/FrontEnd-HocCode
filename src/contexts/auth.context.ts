@@ -1,10 +1,10 @@
 import { createContext } from "react";
-import type { UserInfo } from "@/services/api/user.service";
+import type { User } from "@/services/api/user.types";
 
 export interface AuthContextType {
-    user: UserInfo | null;
+    user: User | null;
     isAuthenticated: boolean;
-    setUser: (user: UserInfo | null) => void;
+    setUser: (user: User | null) => void;
 }
 
 export const AuthContext =

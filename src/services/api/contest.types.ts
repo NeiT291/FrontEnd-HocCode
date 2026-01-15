@@ -1,62 +1,54 @@
-import type { Problem, UserSummary } from "@/services/api/course.types";
+import type { Problem } from "@/services/api/problem.types";
+import type { User } from "@/services/api/user.types";
 
-export interface ContestApi {
-    id: number;
-    thumbnailUrl: string | null;
-    title: string;
-    slug: string;
-    description: string;
-    startTime: string;
-    endTime: string;
-    createdBy: UserSummary;
-    createdAt: string;
-}
-
-export interface ContestPageData {
-    total_records: number;
-    total_records_page: number;
-    current_page: number;
-    total_pages: number;
-    prev_pages: number;
-    next_pages: number;
-    data: ContestApi[];
-}
-
-export interface ContestListResponse {
-    code: number;
-    message: string;
-    data: ContestPageData;
-}
-export interface ContestDetailResponse {
-    code: number;
-    message: string;
-    data: ContestDetail;
-}
-export interface ContestDetail {
+// ================= Request ============
+export interface ContestRequest{
     id: number;
     title: string;
     description: string;
     startTime: string;
     endTime: string;
-    thumbnailUrl?: string | null;
-    userEnroll: unknown | null;
+}
+// ================= Response ============
+export interface ContestPageResponse {
+  code: number;
+  message: string;
+  data: ContestPage;
+}
+export interface ContestPage {
+  total_records: number;
+  total_records_page: number;
+  current_page: number;
+  total_pages: number;
+  prev_pages: number;
+  next_pages: number;
+  data: Contest[];
+}
+export interface ContestResponse {
+    code: number;
+    message: string;
+    data: Contest;
+}
+export interface ContestJoinResponse {
+    code: number;
+    message: string;
+    data: ContestJoin;
+}
+
+export interface Contest {
+    id: number;
+    thumbnailUrl: string;
+    title: string;
+    description: string;
+    startTime: string;
+    endTime: string;
+    createdBy: User;
+    userEnroll: User;
     problems: Problem[];
     createdAt: string;
 }
-export interface ContestJoinInfo {
+
+export interface ContestJoin {
     id: number;
     registeredAt: string;
-}
-export interface CreateContestRequest {
-    title: string;
-    description: string;
-    startTime: string; // yyyy-MM-dd HH:mm:ss
-    endTime: string;   // yyyy-MM-dd HH:mm:ss
-}
-export interface EditContestRequest {
-    id: number;
-    title: string;
-    description: string;
-    startTime: string; // yyyy-MM-dd HH:mm:ss
-    endTime: string;   // yyyy-MM-dd HH:mm:ss
 }

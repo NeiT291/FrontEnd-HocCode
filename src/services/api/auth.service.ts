@@ -1,21 +1,5 @@
 import axiosInstance from "@/services/api/axios";
-
-/* ===== Types ===== */
-
-interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-interface LoginResponse {
-  code: number;
-  message: string;
-  data: {
-    token: string;
-  };
-}
-
-/* ===== API ===== */
+import type { LoginRequest, LoginResponse } from "@/services/api/user.types";
 
 export async function login(
   payload: LoginRequest

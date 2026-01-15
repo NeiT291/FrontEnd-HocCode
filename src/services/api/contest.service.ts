@@ -1,11 +1,12 @@
 import axiosInstance from "@/services/api/axios";
-import type {  ContestDetail, ContestDetailResponse, ContestJoinInfo, ContestListResponse, CreateContestRequest, EditContestRequest } from "@/services/api/contest.types";
+import type { ContestJoinResponse, ContestPageResponse, ContestRequest, ContestResponse } from "./contest.types";
+
 
 export async function getAllContests(
     page = 1,
     pageSize = 6
 ) {
-    const res = await axiosInstance.get<ContestListResponse>(
+    const res = await axiosInstance.get<ContestPageResponse>(
         "/contest/get-all",
         {
             params: { page, pageSize },
@@ -23,7 +24,7 @@ export async function searchContests(
     page: number,
     pageSize: number
 ) {
-    const res = await axiosInstance.get<ContestListResponse>(
+    const res = await axiosInstance.get<ContestPageResponse>(
         "/contest/search",
         {
             params: {
@@ -47,7 +48,7 @@ export async function getContestCreated(
     page = 1,
     pageSize = 6
 ) {
-    const res = await axiosInstance.get<ContestListResponse>(
+    const res = await axiosInstance.get<ContestPageResponse>(
         "/contest/get-created",
         {
             params: { page, pageSize },
@@ -64,7 +65,7 @@ export async function getContestJoined(
     page = 1,
     pageSize = 6
 ) {
-    const res = await axiosInstance.get<ContestListResponse>(
+    const res = await axiosInstance.get<ContestPageResponse>(
         "/contest/get-joined",
         {
             params: { page, pageSize },
@@ -80,7 +81,7 @@ export async function getContestJoined(
 export async function getContestById(
     id: number
 ) {
-    const res = await axiosInstance.get<ContestDetailResponse>(
+    const res = await axiosInstance.get<ContestResponse>(
         "/contest/get-by-id",
         {
             params: { id },
@@ -95,12 +96,8 @@ export async function getContestById(
 }
 export async function checkContestJoined(
   id: number
-): Promise<ContestJoinInfo | null> {
-  const res = await axiosInstance.get<{
-    code: number;
-    message: string;
-    data: ContestJoinInfo | null;
-  }>("/contest/is-join", {
+) {
+  const res = await axiosInstance.get<ContestJoinResponse>("/contest/is-join", {
     params: { id },
   });
 
@@ -113,11 +110,7 @@ export async function checkContestJoined(
 export async function enrollContest(
     contestId: number
 ) {
-    const res = await axiosInstance.get<{
-    code: number;
-    message: string;
-    data: ContestJoinInfo | null;
-  }>(
+    const res = await axiosInstance.get<ContestJoinResponse>(
         "/contest/enroll",
         {
             params: { contestId },
@@ -131,9 +124,9 @@ export async function enrollContest(
     return res.data.data;
 }
 export async function createContest(
-    payload: CreateContestRequest
-): Promise<ContestDetail> {
-   const res = await axiosInstance.post(
+    payload: ContestRequest
+) {
+   const res = await axiosInstance.post<ContestResponse>(
         "/contest/add",
         payload
     );
@@ -145,9 +138,9 @@ export async function createContest(
     return res.data.data;
 }
 export async function modifyContest(
-    payload: EditContestRequest
-): Promise<ContestDetail> {
-   const res = await axiosInstance.put(
+    payload: ContestRequest
+) {
+   const res = await axiosInstance.put<ContestResponse>(
         "/contest/modify",
         payload
     );

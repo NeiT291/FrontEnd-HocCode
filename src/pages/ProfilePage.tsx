@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 import ProfileContent from "@/components/profile/ProfileContent";
-import { getMyProfile } from "@/services/api/profile.service";
-import type { UserProfile } from "@/services/api/profile.types";
+import { getMyInfo } from "@/services/api/user.service";
+import type { User } from "@/services/api/user.types";
 
 const ProfilePage = () => {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [profile, setProfile] = useState<User | null>(null);
 
     const [mainTab, setMainTab] =
         useState<"joined" | "created">("joined");
@@ -16,7 +16,7 @@ const ProfilePage = () => {
     useEffect(() => {
         let mounted = true;
 
-        getMyProfile()
+        getMyInfo()
             .then((data) => {
                 console.log("Fetched profile:", data);
 

@@ -4,7 +4,7 @@ import Editor from "@monaco-editor/react";
 import { Play, CheckCircle, Clock, Database } from "lucide-react";
 
 import { getProblemById } from "@/services/api/problem.service";
-import type { ProblemApi } from "@/services/api/problem.types";
+import type { Problem } from "@/services/api/problem.types";
 
 /* ================= TYPES ================= */
 
@@ -16,7 +16,7 @@ type Language = "cpp" | "java" | "python";
 export default function PracticeDetailPage() {
     const { id } = useParams<{ id: string }>();
 
-    const [problem, setProblem] = useState<ProblemApi | null>(null);
+    const [problem, setProblem] = useState<Problem | null>(null);
     const [language, setLanguage] = useState<Language>("cpp");
     const [code, setCode] = useState(getTemplate("cpp"));
 
@@ -284,9 +284,7 @@ function getTemplate(lang: Language) {
 using namespace std;
 
 int main() {
-    int a, b;
-    cin >> a >> b;
-    cout << a + b;
+    cout << "Hello World!!!";
     return 0;
 }`;
         case "java":
@@ -294,14 +292,10 @@ int main() {
 
 public class Main {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int a = sc.nextInt();
-        int b = sc.nextInt();
-        System.out.println(a + b);
+        System.out.println("Hello World!!!");
     }
 }`;
         case "python":
-            return `a, b = map(int, input().split())
-print(a + b)`;
+            return `print("Hello World!!!")`;
     }
 }
