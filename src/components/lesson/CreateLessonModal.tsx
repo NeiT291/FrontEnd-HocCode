@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BookOpen, Code } from "lucide-react";
 import { createLesson } from "@/services/api/problem.service";
+import type { Testcase } from "@/services/api/problem.types";
 
 /* ================= TYPES ================= */
 
@@ -71,16 +72,17 @@ function CreateLessonModal({
                 memoryLimitKb: type === "PRACTICE" ? memoryLimitKb : 0,
                 position: 0,
                 difficulty: "easy",
+                isPublic: true,
                 isTheory: type === "THEORY",
                 testcases:
                     type === "PRACTICE"
-                        ? testcases.map((tc, index) => ({
+                        ? testcases.map<Testcase>((tc, index) => ({
                             input: tc.input,
                             isSample: true,
                             expectedOutput: tc.expectedOutput,
                             position: index,
                         }))
-                        : [],
+                        : []
             });
 
             onSuccess?.();

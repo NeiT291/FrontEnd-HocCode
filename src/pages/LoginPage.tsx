@@ -52,6 +52,10 @@ const LoginPage = () => {
             const userInfo = await getMyInfo();
             setUser(userInfo);
             toast.success("Đăng nhập thành công");
+            if (userInfo.role.name === "ADMIN") {
+                navigate("/admin");
+                return;
+            }
             navigate("/");
 
         } catch (err: unknown) {

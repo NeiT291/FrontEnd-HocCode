@@ -11,7 +11,7 @@ const ProfilePage = () => {
     const [mainTab, setMainTab] =
         useState<"joined" | "created">("joined");
     const [subTab, setSubTab] =
-        useState<"course" | "class" | "practice" | "contest">("course");
+        useState<"course" | "practice" | "contest">("course");
 
     useEffect(() => {
         let mounted = true;

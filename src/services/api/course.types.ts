@@ -3,12 +3,12 @@ import type { User } from "@/services/api/user.types";
 
 // ================== Request ==================
 export interface CourseRequest {
-  id: number;
-  classId: number;
+  id?: number;
+  classId?: number;
   title: string;
   description: string;
   isPublic: boolean;
-  modules: Module[];
+  modules?: Module[];
 }
 export interface ModuleRequest {
   id?: number;
@@ -57,6 +57,7 @@ export interface Course{
   createdAt: string;
   updatedAt: string;
   modules: Module[];
+  isActive?: boolean;
 }
 export interface Module {
   id: number;

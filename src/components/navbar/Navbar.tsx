@@ -25,9 +25,6 @@ const Navbar = () => {
                         <Link to="/" className="hover:text-blue-600 transition">
                             Trang chủ
                         </Link>
-                        <Link to="/classes" className="hover:text-blue-600 transition">
-                            Lớp học
-                        </Link>
                         <Link to="/courses" className="hover:text-blue-600 transition">
                             Khoá học
                         </Link>

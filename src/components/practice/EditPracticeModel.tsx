@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
-import type { Problem, Testcase } from "@/services/api/course.types";
+import type { Problem, Testcase } from "@/services/api/problem.types";
 import { modifyProblem } from "@/services/api/problem.service";
 import toast from "react-hot-toast";
 
@@ -58,9 +58,11 @@ export default function EditPracticeModal({
         setTestcases((prev) => [
             ...prev,
             {
-                id: crypto.randomUUID(), // FE id tạm
+                id: 1,
                 input: "",
                 expectedOutput: "",
+                isSample: true,
+                position: 0,
             },
         ]);
     };
@@ -101,14 +103,14 @@ export default function EditPracticeModal({
                 timeLimitMs,
                 memoryLimitKb,
                 difficulty: mapDifficultyToApi(difficulty),
+                isTheory: false,
                 isPublic: true,
-                testcases: testcases.map((tc) => ({
-                    id:
-                        typeof tc.id === "number"
-                            ? tc.id
-                            : undefined,
+                testcases: testcases.map<Testcase>((tc, i) => ({
+                    id: tc.id,
                     input: tc.input,
                     expectedOutput: tc.expectedOutput,
+                    isSample: true,
+                    position: i
                 })),
             });
 
@@ -116,6 +118,7 @@ export default function EditPracticeModal({
             onSubmit?.(updatedProblem);
             onClose();
         } catch (error) {
+            console.log(error)
             toast.error("Cập nhật thất bại, vui lòng thử lại");
         } finally {
             setSubmitting(false);
@@ -238,7 +241,7 @@ export default function EditPracticeModal({
                                 value={tc.input}
                                 onChange={(e) =>
                                     updateTestcase(
-                                        tc.id,
+                                        tc.id || NaN,
                                         "input",
                                         e.target.value
                                     )
@@ -251,7 +254,7 @@ export default function EditPracticeModal({
                                 value={tc.expectedOutput}
                                 onChange={(e) =>
                                     updateTestcase(
-                                        tc.id,
+                                        tc.id || NaN,
                                         "expectedOutput",
                                         e.target.value
                                     )
@@ -261,7 +264,7 @@ export default function EditPracticeModal({
 
                             <button
                                 onClick={() =>
-                                    removeTestcase(tc.id)
+                                    removeTestcase(tc.id || NaN)
                                 }
                                 className="text-xs text-red-500 flex items-center gap-1"
                             >

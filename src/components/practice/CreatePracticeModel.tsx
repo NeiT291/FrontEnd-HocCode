@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Code, Plus, Trash2, X } from "lucide-react";
-import type { Problem, Testcase } from "@/services/api/course.types";
+import type { Problem, Testcase } from "@/services/api/problem.types";
 import { createProblem } from "@/services/api/problem.service";
 
 interface Props {
     contestId?: number;
     moduleId?: number;
-    isTheory?: boolean;
+    isTheory: boolean;
     onClose: () => void;
     onSubmit: (practice: Problem) => void;
 }
@@ -46,7 +46,7 @@ export default function CreatePracticeModal({
     const addTestcase = () => {
         setTestcases((prev) => [
             ...prev,
-            { input: "", expectedOutput: "" },
+            { input: "", expectedOutput: "", isSample: true, position: 0 },
         ]);
     };
 
@@ -84,10 +84,11 @@ export default function CreatePracticeModal({
                 difficulty: mapDifficulty(difficulty),
                 isTheory: isTheory,
                 isPublic: true,
-                testcases: testcases.map((tc) => ({
+                testcases: testcases.map<Testcase>((tc, index) => ({
                     input: tc.input,
                     expectedOutput: tc.expectedOutput,
                     isSample: true,
+                    position: index,
                     active: true,
                 })),
             });

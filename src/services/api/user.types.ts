@@ -4,7 +4,7 @@ export interface RegisterRequest {
     password: string;
     repassword: string;
     display_name: string;
-    dob: string;
+    dob?: string;
     email: string;
     phone?: string;
     address?: string; 
@@ -55,6 +55,7 @@ export interface UserPage {
 }
 export interface User{
     displayName: string | null;
+    username: string;
     dob: string | null;
     bio: string | null;
     createdAt: string;

@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 
 import { getProblemsCreated } from "@/services/api/problem.service";
 import CreatePracticeModal from "@/components/practice/CreatePracticeModel";
-import type { Problem } from "@/services/api/course.types";
+import type { Problem } from "@/services/api/problem.types";
 import EditPracticeModal from "@/components/practice/EditPracticeModel";
 
 /* ================= COMPONENT ================= */
@@ -198,6 +198,7 @@ export default function CreatedPracticeList() {
                 <CreatePracticeModal
                     moduleId={0 /* TODO: chọn module nếu cần */}
                     onClose={() => setOpenCreateModal(false)}
+                    isTheory={false}
                     onSubmit={() => {
                         toast.success("Đã tạo bài luyện tập");
                         setOpenCreateModal(false);

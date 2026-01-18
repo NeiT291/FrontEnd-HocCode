@@ -3,7 +3,7 @@ import type { User } from "@/services/api/user.types";
 
 // ================= Request ============
 export interface ContestRequest{
-    id: number;
+    id?: number;
     title: string;
     description: string;
     startTime: string;
@@ -43,9 +43,11 @@ export interface Contest {
     startTime: string;
     endTime: string;
     createdBy: User;
+    totalUserEnroll?: number;
     userEnroll: User;
     problems: Problem[];
     createdAt: string;
+    isActive?: boolean;
 }
 
 export interface ContestJoin {

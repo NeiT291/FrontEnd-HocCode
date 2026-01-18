@@ -2,16 +2,17 @@ import type { User } from "@/services/api/user.types";
 
 // ================== Request =====================
 export interface ProblemRequest {
-    id: number;
+    id?: number;
     title: string;
     description: string;
-    contestId: number;
-    moduleId: number;
+    contestId?: number;
+    moduleId?: number;
     timeLimitMs: number;
     memoryLimitKb: number;
-    difficulty: string;
-    isPublic: boolean;
+    difficulty?: string;
+    isPublic?: boolean;
     isTheory: boolean;
+    position?: number;
     testcases: Testcase[];
 }
 // ================== Response =====================
@@ -48,10 +49,11 @@ export interface Problem {
     updatedAt: string;
     position: number;
     testcases: Testcase[];
+    isActive?: boolean;
 }
 export interface Testcase {
-    id: number;
-    problemId: number;
+    id?: number;
+    problemId?: number;
     input: string;
     expectedOutput: string;
     isSample: boolean;

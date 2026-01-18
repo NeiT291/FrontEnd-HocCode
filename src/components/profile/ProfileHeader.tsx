@@ -1,8 +1,8 @@
 import { Calendar, Mail, Phone, MapPin } from "lucide-react";
-import type { UserProfile } from "@/services/api/profile.types";
+import type { User } from "@/services/api/user.types";
 
 interface Props {
-    profile: UserProfile;
+    profile: User;
 }
 
 const ProfileHeader = ({ profile }: Props) => {

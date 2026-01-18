@@ -3,14 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, Calendar, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { getContestCreated, createContest } from "@/services/api/contest.service";
-import type { ContestApi } from "@/services/api/contest.types"
+import type { Contest } from "@/services/api/contest.types"
 /* ================= COMPONENT ================= */
 
 export default function CreatedContestList() {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
-    const [contests, setContests] = useState<ContestApi[]>([]);
+    const [contests, setContests] = useState<Contest[]>([]);
     const [error, setError] = useState("");
     /* ===== CREATE FORM STATE ===== */
 

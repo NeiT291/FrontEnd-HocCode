@@ -1,6 +1,5 @@
 import {
     Search,
-    Users,
     BookOpen,
     Trophy,
     Code,
@@ -8,14 +7,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-type SearchType = "class" | "course" | "contest" | "practice";
+type SearchType = "course" | "contest" | "practice";
 
 const FILTERS: {
     key: SearchType;
     label: string;
     icon: React.ReactNode;
 }[] = [
-        { key: "class", label: "Lớp học", icon: <Users size={16} /> },
         { key: "course", label: "Khóa học", icon: <BookOpen size={16} /> },
         { key: "contest", label: "Cuộc thi", icon: <Trophy size={16} /> },
         { key: "practice", label: "Luyện tập", icon: <Code size={16} /> },

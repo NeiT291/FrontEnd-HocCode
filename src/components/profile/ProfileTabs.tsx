@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 type MainTab = "joined" | "created";
-type SubTab = "course" | "class" | "practice" | "contest";
+type SubTab = "course" | "practice" | "contest";
 
 interface Props {
     mainTab: MainTab;
@@ -18,7 +18,6 @@ const MAIN_TABS: { key: MainTab; label: string }[] = [
 
 const SUB_TABS: { key: SubTab; label: string }[] = [
     { key: "course", label: "Khóa học" },
-    { key: "class", label: "Lớp học" },
     { key: "practice", label: "Luyện tập" },
     { key: "contest", label: "Cuộc thi" },
 ];
@@ -42,7 +41,6 @@ const ProfileTabs = ({
 
         if (
             sub === "course" ||
-            sub === "class" ||
             sub === "practice" ||
             sub === "contest"
         ) {

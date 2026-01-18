@@ -57,7 +57,7 @@ const CreatedCourseList = () => {
 
     const handleCreate = async (title: string, description: string) => {
         try {
-            const newCourse = await addCourse({ title, description });
+            const newCourse = await addCourse({ title, description, isPublic: true });
 
             setCourses((prev) => [newCourse, ...prev]);
 

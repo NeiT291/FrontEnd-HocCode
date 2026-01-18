@@ -1,16 +1,12 @@
 import { useState } from "react";
 import { BookOpen, Code } from "lucide-react";
 import { deleteTestcase, modifyLesson } from "@/services/api/problem.service";
-import type { Problem } from "@/services/api/course.types";
+import type { Problem, Testcase } from "@/services/api/problem.types";
 import { toast } from "react-hot-toast";
 /* ================= TYPES ================= */
 
 type LessonType = "THEORY" | "PRACTICE";
-type TestcaseForm = {
-    id: number;              // frontend only
-    input: string;
-    expectedOutput: string;
-};
+
 /* ================= COMPONENT ================= */
 
 function EditLessonModal({
@@ -31,11 +27,13 @@ function EditLessonModal({
     const [timeLimitMs, setTimeLimitMs] = useState(lesson.timeLimitMs ?? 1000);
     const [memoryLimitKb, setMemoryLimitKb] = useState(lesson.memoryLimitKb ?? 262144);
 
-    const [testcases, setTestcases] = useState<TestcaseForm[]>(
+    const [testcases, setTestcases] = useState<Testcase[]>(
         (lesson.testcases ?? []).map((tc) => ({
             id: tc.id,
             input: tc.input,
             expectedOutput: tc.expectedOutput,
+            position: tc.position,
+            isSample: true,
         }))
     );
 
@@ -48,6 +46,8 @@ function EditLessonModal({
                 id: 1,
                 input: "",
                 expectedOutput: "",
+                position: 0,
+                isSample: true,
             },
         ]);
     };
@@ -82,11 +82,10 @@ function EditLessonModal({
                 isTheory: type === "THEORY",
                 testcases:
                     type === "PRACTICE"
-                        ? testcases.map((tc, index) => ({
-                            id: tc.id,
+                        ? testcases.map<Testcase>((tc, index) => ({
                             input: tc.input,
-                            expectedOutput: tc.expectedOutput,
                             isSample: true,
+                            expectedOutput: tc.expectedOutput,
                             position: index,
                         }))
                         : [],
@@ -191,7 +190,7 @@ function EditLessonModal({
                                         value={tc.input}
                                         onChange={(e) =>
                                             updateTestcase(
-                                                tc.id,
+                                                tc.id || NaN,
                                                 "input",
                                                 e.target.value
                                             )
@@ -205,7 +204,7 @@ function EditLessonModal({
                                         value={tc.expectedOutput}
                                         onChange={(e) =>
                                             updateTestcase(
-                                                tc.id,
+                                                tc.id || NaN,
                                                 "expectedOutput",
                                                 e.target.value
                                             )
@@ -214,7 +213,7 @@ function EditLessonModal({
                                     />
 
                                     <button
-                                        onClick={() => removeTestcase(tc.id)}
+                                        onClick={() => removeTestcase(tc.id || NaN)}
                                         className="text-xs text-red-500"
                                     >
                                         Xóa testcase

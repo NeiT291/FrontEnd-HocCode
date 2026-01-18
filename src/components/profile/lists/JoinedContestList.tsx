@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getContestJoined } from "@/services/api/contest.service";
+import type { Contest } from "@/services/api/contest.types";
 
 /* ================= COMPONENT ================= */
 
 const JoinedContestList = () => {
     const [loading, setLoading] = useState(false);
-    const [contests, setContests] = useState<any[]>([]);
+    const [contests, setContests] = useState<Contest[]>([]);
     const [error, setError] = useState("");
 
     useEffect(() => {
