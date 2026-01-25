@@ -16,12 +16,17 @@ import { getProblemById } from "@/services/api/problem.service";
 import { getCourseById } from "@/services/api/course.service";
 import type { Problem } from "@/services/api/problem.types";
 import type { Module } from "@/services/api/course.types";
-
+import { runTest, submitCode } from "@/services/api/runcode.service";
+import type { RunCodeProblem } from "@/services/api/runcode.types";
 /* ================= TYPES ================= */
 
 type Difficulty = "easy" | "medium" | "hard";
 type Language = "cpp" | "java" | "python";
-
+const LANGUAGE_MAP: Record<Language, { id: number; label: string }> = {
+    cpp: { id: 54, label: "cpp" },
+    java: { id: 62, label: "java" },
+    python: { id: 71, label: "python" },
+};
 /* ================= PAGE ================= */
 
 export default function LessonDetailPage() {
@@ -39,7 +44,15 @@ export default function LessonDetailPage() {
 
     const [language, setLanguage] = useState<Language>("cpp");
     const [code, setCode] = useState(getTemplate("cpp"));
+    const isTheory = problem?.isTheory;
 
+    const [running, setRunning] = useState(false);
+    const [runResult, setRunResult] = useState<RunCodeProblem | null>(null);
+    const [runError, setRunError] = useState("");
+
+    const [submitting, setSubmitting] = useState(false);
+    const [submitResult, setSubmitResult] = useState<RunCodeProblem | null>(null);
+    const [submitError, setSubmitError] = useState("");
     /* ================= LOAD CURRENT LESSON ================= */
 
     useEffect(() => {
@@ -83,7 +96,60 @@ export default function LessonDetailPage() {
                 : [...prev, moduleId]
         );
     };
+    const handleRun = async () => {
+        if (!problem) return;
 
+        try {
+            setRunning(true);
+            setRunError("");
+            setRunResult(null);
+            setSubmitResult(null);
+            const res = await runTest({
+                problemId: problem.id,
+                languageId: LANGUAGE_MAP[language].id,
+                language: LANGUAGE_MAP[language].label,
+                sourceCode: code,
+            });
+            setRunResult(res);
+        } catch (err) {
+            setRunError(
+                err instanceof Error ? err.message : "Run code failed"
+            );
+        } finally {
+            setRunning(false);
+        }
+    };
+    const handleSubmit = async () => {
+        if (!problem) return;
+
+
+        try {
+            setSubmitting(true);
+            setSubmitError("");
+            setSubmitResult(null);
+            setRunResult(null);
+            const res = await submitCode({
+                problemId: problem.id,
+                languageId: LANGUAGE_MAP[language].id,
+                language: LANGUAGE_MAP[language].label,
+                sourceCode: code,
+            });
+            setSubmitResult(res);
+            if (res.verdict === "Accepted") {
+
+                const nextId = getNextLessonId(modules, problem.id);
+                if (nextId) {
+                    window.location.href = `/lessons/${nextId}?courseId=${courseId}`;
+                }
+            }
+        } catch (err) {
+            setSubmitError(
+                err instanceof Error ? err.message : "Submit failed"
+            );
+        } finally {
+            setSubmitting(false);
+        }
+    };
     /* ================= STATE RENDER ================= */
 
     if (!lessonId || Number.isNaN(lessonId)) {
@@ -122,7 +188,7 @@ export default function LessonDetailPage() {
                 >
                     {/* ================= SIDEBAR ================= */}
                     {showSidebar && (
-                        <aside className="lg:col-span-3 bg-white rounded-2xl shadow-sm p-4 h-fit sticky top-4">
+                        <aside className="lg:col-span-3 bg-white rounded-2xl shadow-sm p-4 h-fit top-4">
                             <h2 className="text-sm font-semibold text-gray-900 mb-4">
                                 Nội dung khóa học
                             </h2>
@@ -240,6 +306,31 @@ export default function LessonDetailPage() {
                         <p className="mt-6 text-gray-700 leading-relaxed">
                             {problem.description}
                         </p>
+                        {/* SAMPLE TEST CASE */}
+                        <div className="mt-10">
+                            <h2 className="text-lg font-semibold mb-4">
+                                Test case mẫu
+                            </h2>
+
+                            <div className="space-y-4">
+                                {problem.testcases
+                                    .filter((tc) => tc.isSample)
+                                    .sort(
+                                        (a, b) =>
+                                            a.position - b.position
+                                    )
+                                    .map((tc, index) => (
+                                        <TestCase
+                                            key={tc.id}
+                                            index={index + 1}
+                                            input={tc.input}
+                                            output={
+                                                tc.expectedOutput
+                                            }
+                                        />
+                                    ))}
+                            </div>
+                        </div>
                     </section>
 
                     {/* ================= EDITOR ================= */}
@@ -269,13 +360,18 @@ export default function LessonDetailPage() {
                             <div className="flex gap-2">
                                 <ActionButton
                                     icon={<Play size={16} />}
-                                    label="Run"
+                                    label={running ? "Running..." : "Run"}
                                     variant="primary"
+                                    disabled={isTheory || running}
+                                    onClick={handleRun}
                                 />
+
                                 <ActionButton
                                     icon={<CheckCircle size={16} />}
-                                    label="Submit"
+                                    label={submitting ? "Submitting..." : "Submit"}
                                     variant="success"
+                                    disabled={submitting}
+                                    onClick={handleSubmit}
                                 />
                             </div>
                         </div>
@@ -293,6 +389,159 @@ export default function LessonDetailPage() {
                                 }}
                             />
                         </div>
+                        {/* ================= RUN RESULT ================= */}
+                        {runError && (
+                            <div className="border-t p-4 text-red-600 bg-red-50 text-sm">
+                                {runError}
+                            </div>
+                        )}
+
+                        {runResult && (
+                            <div className="border-t p-4 space-y-4 overflow-y-auto max-h-72 bg-white">
+                                <div className="flex justify-between font-semibold">
+                                    <span>
+                                        Kết quả:{" "}
+                                        {runResult.verdict}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                        Passed{" "}
+                                        {runResult.passedCount}/
+                                        {runResult.totalCount}
+                                    </span>
+                                </div>
+
+                                {runResult.testCaseResult.map(
+                                    (tc, index) => (
+                                        <div
+                                            key={
+                                                tc.testCaseId
+                                            }
+                                            className="border rounded-xl"
+                                        >
+                                            <div className="px-4 py-2 bg-gray-50 flex justify-between rounded-xl">
+                                                <span>
+                                                    Test #
+                                                    {index + 1}
+                                                </span>
+                                                <span
+                                                    className={`font-semibold ${tc.statusId ===
+                                                        3
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                        }`}
+                                                >
+                                                    {tc.status}
+                                                </span>
+                                            </div>
+
+                                            <div className="p-4 space-y-2 text-sm">
+                                                {tc.stdout && (
+                                                    <ResultBlock
+                                                        label="Output"
+                                                        value={
+                                                            tc.stdout
+                                                        }
+                                                    />
+                                                )}
+                                                {tc.stderr && (
+                                                    <ResultBlock
+                                                        label="Error"
+                                                        value={
+                                                            tc.stderr
+                                                        }
+                                                    />
+                                                )}
+                                                {tc.compileOutput && (
+                                                    <ResultBlock
+                                                        label="Compile Output"
+                                                        value={
+                                                            tc.compileOutput
+                                                        }
+                                                    />
+                                                )}
+
+                                                <div className="flex gap-4 text-xs text-gray-500">
+                                                    <span>
+                                                        {"Time: "}
+                                                        {tc.time}
+                                                    </span>
+                                                    <span>
+                                                        {"Memory: "}
+                                                        {tc.memory}{" "}
+                                                        KB
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                        )}
+                        {/* ================= SUBMIT RESULT ================= */}
+                        {submitError && (
+                            <div className="border-t p-4 text-red-600 bg-red-50 text-sm">
+                                {submitError}
+                            </div>
+                        )}
+
+                        {submitResult && (
+                            <div className="border-t p-4 space-y-4 bg-green-50">
+                                <div className="flex justify-between font-semibold">
+                                    <span>
+                                        Kết quả: {submitResult.verdict}
+                                    </span>
+                                    <span className="text-sm">
+                                        Passed {submitResult.passedCount}/
+                                        {submitResult.totalCount}
+                                    </span>
+                                </div>
+
+                                {submitResult.testCaseResult.map((tc, index) => (
+                                    <div
+                                        key={tc.testCaseId}
+                                        className="border rounded-xl bg-white"
+                                    >
+                                        <div className="px-4 py-2 bg-gray-50 flex justify-between rounded-xl">
+                                            <span>Test #{index + 1}</span>
+                                            <span
+                                                className={`font-semibold ${tc.statusId === 3
+                                                    ? "text-green-600"
+                                                    : "text-red-600"
+                                                    }`}
+                                            >
+                                                {tc.status}
+                                            </span>
+                                        </div>
+
+                                        <div className="p-4 space-y-2 text-sm">
+                                            {tc.stdout && (
+                                                <ResultBlock
+                                                    label="Output"
+                                                    value={tc.stdout}
+                                                />
+                                            )}
+                                            {tc.stderr && (
+                                                <ResultBlock
+                                                    label="Stderr"
+                                                    value={tc.stderr}
+                                                />
+                                            )}
+                                            {tc.compileOutput && (
+                                                <ResultBlock
+                                                    label="Compile Output"
+                                                    value={tc.compileOutput}
+                                                />
+                                            )}
+
+                                            <div className="flex gap-4 text-xs text-gray-500">
+                                                <span>Time: {tc.time}</span>
+                                                <span>Memory: {tc.memory} KB</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </section>
                 </div>
             </div>
@@ -345,28 +594,38 @@ function ActionButton({
     icon,
     label,
     variant,
+    disabled,
+    onClick,
 }: {
     icon: React.ReactNode;
     label: string;
     variant?: "primary" | "success";
+    disabled?: boolean;
+    onClick?: () => void;
 }) {
     const base =
-        "flex items-center gap-1 px-4 py-2 rounded-lg text-sm transition cursor-pointer active:scale-95";
+        "flex items-center gap-1 px-4 py-2 rounded-lg text-sm transition";
 
     const styles =
         variant === "primary"
             ? "bg-gray-900 text-white hover:bg-gray-800"
-            : variant === "success"
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "border hover:bg-gray-50";
+            : "bg-green-600 text-white hover:bg-green-700";
 
     return (
-        <button className={`${base} ${styles}`}>
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={`${base} ${styles} ${disabled
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer active:scale-95"
+                }`}
+        >
             {icon}
             {label}
         </button>
     );
 }
+
 
 /* ================= HELPERS ================= */
 
@@ -397,4 +656,75 @@ public class Main {
             return `a, b = map(int, input().split())
 print(a + b)`;
     }
+}
+function getNextLessonId(
+    modules: Module[],
+    currentLessonId: number
+): number | null {
+    for (const m of modules) {
+        const idx = m.problems.findIndex(p => p.id === currentLessonId);
+        if (idx !== -1) {
+            if (idx + 1 < m.problems.length) {
+                return m.problems[idx + 1].id;
+            }
+        }
+    }
+    return null;
+}
+function TestCase({
+    index,
+    input,
+    output,
+}: {
+    index: number;
+    input: string;
+    output: string;
+}) {
+    return (
+        <div className="border rounded-xl">
+            <div className="px-4 py-2 bg-gray-50 font-semibold rounded-xl">
+                Test case #{index}
+            </div>
+            <div className="p-4 grid sm:grid-cols-2 gap-4">
+                <CodeBlock label="Input" value={input} />
+                <CodeBlock label="Output" value={output} />
+            </div>
+        </div>
+    );
+}
+function CodeBlock({
+    label,
+    value,
+}: {
+    label: string;
+    value: string;
+}) {
+    return (
+        <div>
+            <p className="text-xs text-gray-500 mb-1">
+                {label}
+            </p>
+            <pre className="bg-gray-900 text-gray-100 rounded-lg p-3 text-sm overflow-x-auto">
+                {value}
+            </pre>
+        </div>
+    );
+}
+function ResultBlock({
+    label,
+    value,
+}: {
+    label: string;
+    value: string;
+}) {
+    return (
+        <div>
+            <p className="text-xs text-gray-500 mb-1">
+                {label}
+            </p>
+            <pre className="bg-gray-900 text-gray-100 rounded-lg p-3 text-xs overflow-x-auto">
+                {value}
+            </pre>
+        </div>
+    );
 }

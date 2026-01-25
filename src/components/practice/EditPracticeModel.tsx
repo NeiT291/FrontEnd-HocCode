@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
 import type { Problem, Testcase } from "@/services/api/problem.types";
-import { modifyProblem } from "@/services/api/problem.service";
+import { deleteTestcase, modifyProblem } from "@/services/api/problem.service";
 import toast from "react-hot-toast";
 
 /* ================= TYPES ================= */
@@ -11,6 +11,7 @@ type ApiDifficulty = "easy" | "medium" | "hard";
 
 interface Props {
     practice: Problem;
+    isPublic: boolean;
     onClose: () => void;
     onSubmit?: (data: Problem) => void;
 }
@@ -19,6 +20,7 @@ interface Props {
 
 export default function EditPracticeModal({
     practice,
+    isPublic,
     onClose,
     onSubmit,
 }: Props) {
@@ -79,7 +81,8 @@ export default function EditPracticeModal({
         );
     };
 
-    const removeTestcase = (id: number | string) => {
+    const removeTestcase = (id: number) => {
+        deleteTestcase(id);
         setTestcases((prev) => prev.filter((t) => t.id !== id));
     };
 
@@ -104,7 +107,7 @@ export default function EditPracticeModal({
                 memoryLimitKb,
                 difficulty: mapDifficultyToApi(difficulty),
                 isTheory: false,
-                isPublic: true,
+                isPublic: isPublic,
                 testcases: testcases.map<Testcase>((tc, i) => ({
                     id: tc.id,
                     input: tc.input,

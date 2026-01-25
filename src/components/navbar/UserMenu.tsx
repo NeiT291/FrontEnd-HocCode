@@ -93,11 +93,11 @@ const UserMenu = () => {
                         </Link>
 
                         <Link
-                            to="/profile?main=joined&sub=class"
+                            to="/change-password"
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                         >
                             <GraduationCap className="w-4 h-4 text-gray-400" />
-                            Lớp học
+                            Đổi mật khẩu
                         </Link>
 
                         <button

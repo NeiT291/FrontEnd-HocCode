@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, Calendar, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { getContestCreated, createContest } from "@/services/api/contest.service";
+import { getContestCreated, createContest, deleteContest } from "@/services/api/contest.service";
 import type { Contest } from "@/services/api/contest.types"
 /* ================= COMPONENT ================= */
 
@@ -21,25 +21,21 @@ export default function CreatedContestList() {
     const [description, setDescription] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [mounted, setMounted] = useState(true);
     const fetchContests = async () => {
         try {
             setLoading(true);
             const data = await getContestCreated(1, 10);
-            if (mounted) setContests(data.data);
+            setContests(data.data);
         } catch (err) {
-            console.log(err)
+            console.error(err);
             setError("Không tải được danh sách cuộc thi");
         } finally {
             setLoading(false);
         }
     };
+
     useEffect(() => {
-        setMounted(true);
         fetchContests();
-        return () => {
-            setMounted(false);
-        };
     }, []);
 
     /* ================= ACTIONS ================= */
@@ -92,9 +88,18 @@ export default function CreatedContestList() {
         }
     };
 
-    const handleDelete = (id: number) => {
-
-        console.log("Delete contest:", id);
+    const handleDelete = async (id: number) => {
+        try {
+            setLoading(true);
+            await deleteContest(id);   // ⬅️ đợi xóa xong
+            await fetchContests();     // ⬅️ reload danh sách
+            console.log("Deleted contest:", id);
+        } catch (err) {
+            console.error("Delete contest error:", err);
+            setError("Xóa cuộc thi thất bại");
+        } finally {
+            setLoading(false);
+        }
     };
 
     /* ================= RENDER ================= */

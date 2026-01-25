@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
-import { getCoursesCreated, addCourse } from "@/services/api/course.service";
+import { getCoursesCreated, addCourse, deleteCourse } from "@/services/api/course.service";
 import type { Course } from "@/services/api/course.types";
+import toast from "react-hot-toast";
 
 const CreatedCourseList = () => {
     const navigate = useNavigate();
@@ -13,41 +14,60 @@ const CreatedCourseList = () => {
 
     const [openCreate, setOpenCreate] = useState(false);
 
-    useEffect(() => {
-        let mounted = true;
+    const isMounted = useRef(true);
+    const fetchCourses = useCallback(async () => {
+        if (!isMounted.current) return;
 
-        const fetchCourses = async () => {
-            if (!mounted) return;
+        setLoading(true);
+        setError("");
 
-            setLoading(true);
-            setError("");
-
-            try {
-                const data = await getCoursesCreated(1, 10);
-                if (mounted) setCourses(data);
-            } catch (err: unknown) {
-                if (mounted) {
-                    setError(
-                        err instanceof Error
-                            ? err.message
-                            : "Không tải được danh sách khóa học"
-                    );
-                }
-            } finally {
-                if (mounted) setLoading(false);
+        try {
+            const data = await getCoursesCreated(1, 10);
+            if (isMounted.current) {
+                setCourses(data);
             }
-        };
-
-        fetchCourses();
-        return () => {
-            mounted = false;
-        };
+        } catch (err: unknown) {
+            if (isMounted.current) {
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : "Không tải được danh sách khóa học"
+                );
+            }
+        } finally {
+            if (isMounted.current) {
+                setLoading(false);
+            }
+        }
     }, []);
+
+    /* ================= LIFECYCLE ================= */
+
+    useEffect(() => {
+        isMounted.current = true;
+        fetchCourses();
+
+        return () => {
+            isMounted.current = false;
+        };
+    }, [fetchCourses]);
 
     /* ================= ACTIONS ================= */
 
-    const handleDelete = (id: number) => {
-        console.log("Delete course:", id);
+    const handleDelete = async (id: number) => {
+        try {
+            setLoading(true);
+            await deleteCourse(id);
+            await fetchCourses();
+            toast.success("Xóa khóa học thành công")
+        } catch (err) {
+            console.error("Delete course error:", err);
+            alert("Xóa khóa học thất bại");
+        } finally {
+            if (isMounted.current) {
+                setLoading(false);
+            }
+        }
     };
 
     const handleEdit = (id: number) => {

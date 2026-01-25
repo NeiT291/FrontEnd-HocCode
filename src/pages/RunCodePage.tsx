@@ -1,23 +1,26 @@
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
-import {
-    Play,
-    Terminal,
-    Trash2,
-} from "lucide-react";
+import { Play, Terminal, Trash2 } from "lucide-react";
 
 import { runCodeApi } from "@/services/api/runcode.service";
 
 type Language = "cpp" | "java" | "python";
 
+const LANGUAGE_MAP: Record<Language, number> = {
+    cpp: 54,
+    java: 62,
+    python: 71,
+};
+
 export default function RunCodePage() {
     const [language, setLanguage] = useState<Language>("cpp");
     const [code, setCode] = useState(getTemplate("cpp"));
+    const [input, setInput] = useState("");
 
-    const [output, setOutput] = useState<string>("");
-    const [meta, setMeta] = useState<string>("");
+    const [output, setOutput] = useState("");
+    const [meta, setMeta] = useState("");
     const [running, setRunning] = useState(false);
-    const [error, setError] = useState<string>("");
+    const [error, setError] = useState("");
 
     const handleRun = async () => {
         setRunning(true);
@@ -26,16 +29,22 @@ export default function RunCodePage() {
         setMeta("");
 
         try {
-            const result = await runCodeApi(language, code);
+            const result = await runCodeApi({
+                languageId: LANGUAGE_MAP[language],
+                sourceCode: code,
+                input,
+            });
 
-            if (result.stderr) {
+            if (result.compileOutput) {
+                setError(result.compileOutput);
+            } else if (result.stderr) {
                 setError(result.stderr);
             }
 
             setOutput(result.stdout || "(Không có output)");
 
             setMeta(
-                `Exit code: ${result.exitCode} | Time: ${result.timeMs} ms | Memory: ${result.memoryMb} MB`
+                `Status: ${result.status} | Time: ${result.time ?? "-"} s | Memory: ${result.memory ?? "-"} KB`
             );
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -57,7 +66,7 @@ export default function RunCodePage() {
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-6 py-6">
-                <section className="bg-gray-700 rounded-2xl shadow-sm flex flex-col h-[760px]">
+                <section className="bg-gray-700 rounded-2xl shadow-sm flex flex-col h-[620px]">
                     {/* ================= TOOLBAR ================= */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-600">
                         <select
@@ -74,15 +83,13 @@ export default function RunCodePage() {
                             <option value="python">Python</option>
                         </select>
 
-                        <div className="flex gap-2">
-                            <ActionButton
-                                icon={<Play size={16} />}
-                                label={running ? "Running..." : "Run"}
-                                variant="primary"
-                                disabled={running}
-                                onClick={handleRun}
-                            />
-                        </div>
+                        <ActionButton
+                            icon={<Play size={16} />}
+                            label={running ? "Running..." : "Run"}
+                            variant="primary"
+                            disabled={running}
+                            onClick={handleRun}
+                        />
                     </div>
 
                     {/* ================= EDITOR ================= */}
@@ -98,6 +105,20 @@ export default function RunCodePage() {
                                 automaticLayout: true,
                                 scrollBeyondLastLine: false,
                             }}
+                        />
+                    </div>
+
+                    {/* ================= INPUT ================= */}
+                    <div className="border-t border-gray-600 bg-gray-800 px-4 py-3">
+                        <label className="text-xs text-gray-300 mb-1 block">
+                            Input (stdin)
+                        </label>
+                        <textarea
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            rows={3}
+                            className="w-full bg-gray-900 text-gray-100 rounded p-2 text-sm font-mono resize-none"
+                            placeholder="Ví dụ: 3 5"
                         />
                     </div>
 
@@ -167,9 +188,7 @@ function ActionButton({
     const styles =
         variant === "primary"
             ? "bg-gray-900 text-white hover:bg-gray-800"
-            : variant === "success"
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "border hover:bg-gray-50";
+            : "border hover:bg-gray-50";
 
     return (
         <button
@@ -193,7 +212,9 @@ function getTemplate(lang: Language) {
 using namespace std;
 
 int main() {
-    cout << "HelloWorld";
+    int a, b;
+    cin >> a >> b;
+    cout << a + b;
     return 0;
 }`;
         case "java":
@@ -201,10 +222,15 @@ int main() {
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("HelloWorld");
+        Scanner sc = new Scanner(System.in);
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        System.out.println(a + b);
     }
 }`;
         case "python":
-            return `print("HelloWorld")`;
+            return `a = int(input())
+b = int(input())
+print(a + b)`;
     }
 }

@@ -65,6 +65,7 @@ function EditLessonModal({
     };
 
     const removeTestcase = (id: number) => {
+        console.log("testcaseid: " + id);
         deleteTestcase(id);
         setTestcases((prev) => prev.filter((tc) => tc.id !== id));
     };

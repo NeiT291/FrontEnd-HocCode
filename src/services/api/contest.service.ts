@@ -1,5 +1,5 @@
-import axiosInstance from "@/services/api/axios";
-import type { ContestJoinResponse, ContestPageResponse, ContestRequest, ContestResponse } from "./contest.types";
+import axiosInstance, { type ApiResponseNoData } from "@/services/api/axios";
+import type { ContestJoinResponse, ContestPageResponse, ContestRankingResponse, ContestRequest, ContestResponse } from "./contest.types";
 
 
 export async function getAllContests(
@@ -175,4 +175,34 @@ export async function setContestThumbnail(
     }
 
     return res.data.data?.thumbnailUrl ?? "";
+}
+export async function getContestRanking(
+    page: number,
+    pageSize: number,
+    contestId: number
+) {
+    const res = await axiosInstance.get<ContestRankingResponse>(
+        "/contest/ranking",
+        {
+            params: { page,pageSize,contestId },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không lấy được danh sách cuộc thi");
+    }
+
+    return res.data.data;
+}
+
+export async function deleteContest(
+    id: number
+){
+    const res = await axiosInstance.delete<ApiResponseNoData>(
+        "/contest/delete-contest",
+        { params: { id } }
+    );
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không xóa được cuộc thi");
+    }
 }

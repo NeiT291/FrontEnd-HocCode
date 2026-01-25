@@ -1,5 +1,5 @@
-import axiosInstance from "@/services/api/axios";
-import type { CourseEnrollResponse, CourseModuleResponse, CoursePageResponse, CourseRequest, CourseResponse, ModuleRequest } from "@/services/api/course.types";
+import axiosInstance, { type ApiResponseNoData } from "@/services/api/axios";
+import type { CourseEnrollResponse, CourseModuleResponse, CoursePageResponse, CourseProcessResponse, CourseRequest, CourseResponse, ModuleRequest } from "@/services/api/course.types";
 
 export async function getAllCourses(
   page: number,
@@ -216,6 +216,35 @@ export async function updateModule(
 
 export async function deleteModule(
     moduleId: number
-): Promise<void> { 
-    console.log("Deleting module:", moduleId);
+){
+    const res = await axiosInstance.delete<ApiResponseNoData>(
+        "/course/delete-module",
+        { params: { moduleId } }
+    );
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không xóa được module");
+    }
+}
+export async function getCourseProcess(courseId: number) {
+  const res = await axiosInstance.get<CourseProcessResponse>(
+    "/course/get-process",
+    { params: { courseId } }
+  );
+
+  if (res.data.code !== 200) {
+    throw new Error(res.data.message || "Không lấy được process");
+  }
+
+  return res.data.data;
+}
+export async function deleteCourse(
+    id: number
+){
+    const res = await axiosInstance.delete<ApiResponseNoData>(
+        "/course/delete-course",
+        { params: { id } }
+    );
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không xóa được khóa học");
+    }
 }

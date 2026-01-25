@@ -83,7 +83,7 @@ export default function CreatePracticeModal({
                 memoryLimitKb,
                 difficulty: mapDifficulty(difficulty),
                 isTheory: isTheory,
-                isPublic: true,
+                isPublic: false,
                 testcases: testcases.map<Testcase>((tc, index) => ({
                     input: tc.input,
                     expectedOutput: tc.expectedOutput,

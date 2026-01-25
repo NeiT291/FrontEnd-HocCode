@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Navbar from "@/components/navbar/Navbar";
 import {
     LayoutDashboard,
@@ -7,6 +7,9 @@ import {
     Dumbbell,
     Users,
 } from "lucide-react";
+import type { User } from "@/services/api/user.types";
+import { getMyInfo } from "@/services/api/user.service";
+import { useEffect } from "react";
 
 const menuItems = [
     { label: "Tổng quan", path: "/admin", icon: LayoutDashboard },
@@ -17,6 +20,24 @@ const menuItems = [
 ];
 
 export default function AdminLayout() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            try {
+                const user: User = await getMyInfo();
+
+                if (!user || user.role?.name !== "ADMIN") {
+                    navigate("/", { replace: true });
+                }
+            } catch {
+                navigate("/", { replace: true });
+            }
+        };
+
+        checkAdmin();
+    }, [navigate]);
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col">
             {/* ===== NAVBAR ===== */}

@@ -122,18 +122,36 @@ export default function ContestDetailPage() {
                                     disabled={!canJoin || enrolling}
                                     onClick={handleJoinContest}
                                     className="
-          inline-flex items-center gap-2
-          px-6 py-3 rounded-xl
-          bg-gray-900 text-white
-          hover:bg-gray-800
-          disabled:opacity-40
-        "
+                                                inline-flex items-center gap-2
+                                                px-6 py-3 rounded-xl
+                                                bg-gray-900 text-white
+                                                hover:bg-gray-800
+                                                disabled:opacity-40
+                                                "
                                 >
                                     <PlayCircle size={18} />
                                     {enrolling ? "Đang tham gia..." : "Tham gia cuộc thi"}
                                 </button>
                             )}
                         </div>
+                        {/* ===== VIEW RANKING ===== */}
+                        <Link
+                            to={`/contests/${contest.id}/ranking`}
+                            className="
+                                inline-flex items-center gap-3
+                        px-8 py-4 rounded-2xl
+                        bg-white
+                        border border-gray-200
+                        text-gray-800 text-lg font-medium
+                        shadow-sm
+                        hover:shadow-md
+                        hover:border-gray-300
+                        hover:bg-gray-50
+                        transition mt-20 mb-20
+                            "
+                        >
+                            🏆 Bảng xếp hạng
+                        </Link>
                     </div>
                 </section>
 

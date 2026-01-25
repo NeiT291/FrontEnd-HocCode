@@ -25,6 +25,10 @@ export interface LoginRequest {
 export interface LogoutRequest {
   token: string;
 }
+export interface ChangePasswordRequest{
+    oldPassword: string;
+    newPassword: string;
+}
 // ================== Response ======================
 
 export interface UserResponse {

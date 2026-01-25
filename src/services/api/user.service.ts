@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/api/axios";
-import type { UpdateUserRequest, RegisterRequest, User, UserResponse } from "@/services/api/user.types";
+import type { UpdateUserRequest, RegisterRequest, User, UserResponse, ChangePasswordRequest } from "@/services/api/user.types";
 
 export async function getMyInfo(): Promise<User> {
     const res = await axiosInstance.get<UserResponse>(
@@ -57,4 +57,16 @@ export async function uploadAvatar(
     return {
         avatarUrl: URL.createObjectURL(file),
     };
+}
+export async function changePassword(
+    payload: ChangePasswordRequest
+) {
+    const res = await axiosInstance.post<UserResponse>(
+        "/users/change-password",
+        payload
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "đổi mật khẩu thất bại");
+    }
 }

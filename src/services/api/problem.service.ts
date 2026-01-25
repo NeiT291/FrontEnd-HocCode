@@ -83,11 +83,6 @@ export async function modifyLesson(payload: ProblemRequest) {
         throw new Error(res.data.message || "Không tạo được bài tập");
     }
 }
-export async function deleteLesson(
-    lessonId: number
-){
-    console.log("Deleting lesson:", lessonId);
-}
 export async function deleteTestcase(
     id: number
 ){
@@ -103,15 +98,13 @@ export async function deleteTestcase(
 export async function getProblemsCreated(
     page: number,
     pageSize: number,
-    difficulty?: "easy" | "medium" | "hard"
 ) {
     const res = await axiosInstance.get<ProblemPageResponse>(
-        "/problems/get-all",
+        "/problems/get-created",
         {
             params: {
                 page,
                 pageSize,
-                ...(difficulty ? { difficulty } : {}),
             },
         }
     );
@@ -153,7 +146,35 @@ export async function modifyProblem(
     return res.data.data;
 }
 export async function deleteProblem(
-    problemId: number
+    id: number
 ){
-    console.log(problemId);
+    const res = await axiosInstance.delete<ApiResponseNoData>(
+        "/problems/delete-problem",
+        { params: { id } }
+    );
+    if (res.data.code !== 200) {
+        throw new Error(res.data.message || "Không xóa được problem");
+    }
+}
+export async function getProblemsDone(
+    page: number,
+    pageSize: number,
+) {
+    const res = await axiosInstance.get<ProblemPageResponse>(
+        "/problems/get-dones",
+        {
+            params: {
+                page,
+                pageSize,
+            },
+        }
+    );
+
+    if (res.data.code !== 200) {
+        throw new Error(
+            res.data.message || "Không lấy được danh sách bài luyện tập"
+        );
+    }
+
+    return res.data.data;
 }

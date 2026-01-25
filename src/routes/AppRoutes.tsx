@@ -11,6 +11,7 @@ import CourseDetailPage from "@/pages/CourseDetailPage";
 import ContestDetailPage from "@/pages/ContestDetailPage";
 import CoursesPage from "@/pages/CoursesPage";
 import ContestsPage from "@/pages/ContestsPage";
+import ContestRankingPage from "@/pages/ContestRankingPage";
 import PracticePage from "@/pages/PracticePage";
 import SearchPage from "@/pages/SearchPage";
 import ProfilePage from "@/pages/ProfilePage";
@@ -25,6 +26,7 @@ import AdminCourses from "@/pages/admin/AdminCourses";
 import AdminContests from "@/pages/admin/AdminContests";
 import AdminPractices from "@/pages/admin/AdminPractices";
 import AdminUsers from "@/pages/admin/AdminUsers";
+import ChangePasswordPage from "@/pages/ChangePasswordPage";
 
 const AppRoutes = () => {
     return (
@@ -40,6 +42,8 @@ const AppRoutes = () => {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/information" element={<EditProfilePage />} />
 
+                    <Route path="/change-password" element={<ChangePasswordPage />} />
+
                     <Route path="/search" element={<SearchPage />} />
 
                     <Route path="/courses" element={<CoursesPage />} />
@@ -51,7 +55,7 @@ const AppRoutes = () => {
                     <Route path="/contests" element={<ContestsPage />} />
                     <Route path="/contests/:id" element={<ContestDetailPage />} />
                     <Route path="/contests/edit/:id" element={<EditContestPage />} />
-
+                    <Route path="/contests/:id/ranking" element={<ContestRankingPage />} />
                     <Route path="/practice" element={<PracticePage />} />
                     <Route path="/practice/:id" element={<PracticeDetailPage />} />
 

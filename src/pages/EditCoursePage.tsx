@@ -22,7 +22,7 @@ import {
     updateModule,
     deleteModule,
 } from "@/services/api/course.service";
-import { deleteLesson } from "@/services/api/problem.service";
+import { deleteProblem } from "@/services/api/problem.service";
 import type { Course, Module } from "@/services/api/course.types";
 import type { Problem } from "@/services/api/problem.types";
 import CreateLessonModal from "@/components/lesson/CreateLessonModal";
@@ -162,7 +162,7 @@ export default function EditCoursePage() {
 
     const handleDeleteLesson = async (lessonId: number) => {
         if (!confirm("Xóa bài học này?")) return;
-        await deleteLesson(lessonId);
+        await deleteProblem(lessonId);
         reloadCourse();
     };
 
@@ -235,7 +235,7 @@ export default function EditCoursePage() {
                     />{" "}
                     <label className="text-sm font-medium"> Mô tả </label>{" "}
                     <textarea
-                        rows={5}
+                        rows={7}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-gray-900/20"

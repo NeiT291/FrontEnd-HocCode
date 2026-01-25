@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { getProblemsCreated } from "@/services/api/problem.service";
+import { deleteProblem, getProblemsCreated } from "@/services/api/problem.service";
 import CreatePracticeModal from "@/components/practice/CreatePracticeModel";
 import type { Problem } from "@/services/api/problem.types";
 import EditPracticeModal from "@/components/practice/EditPracticeModel";
@@ -48,10 +48,19 @@ export default function CreatedPracticeList() {
         setEditingPractice(practice);
     };
 
-    const handleDelete = (id: number) => {
-        toast("Chức năng xóa bài luyện tập chưa được triển khai");
-        console.log("Delete practice:", id);
+    const handleDelete = async (id: number) => {
+        try {
+            setLoading(true);
+            await deleteProblem(id);   // ⬅️ đợi xóa xong
+            await fetchPractices();    // ⬅️ reload lại list
+        } catch (err) {
+            console.error("Delete practice error:", err);
+            setError("Xóa bài luyện tập thất bại");
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     /* ================= RENDER ================= */
 
@@ -196,7 +205,6 @@ export default function CreatedPracticeList() {
             {/* CREATE PRACTICE MODAL */}
             {openCreateModal && (
                 <CreatePracticeModal
-                    moduleId={0 /* TODO: chọn module nếu cần */}
                     onClose={() => setOpenCreateModal(false)}
                     isTheory={false}
                     onSubmit={() => {
@@ -209,9 +217,9 @@ export default function CreatedPracticeList() {
             {editingPractice && (
                 <EditPracticeModal
                     practice={editingPractice}
+                    isPublic={true}
                     onClose={() => setEditingPractice(null)}
                     onSubmit={() => {
-                        toast.success("Đã tạo bài luyện tập");
                         setEditingPractice(null);
                         fetchPractices(); // reload list
                     }}

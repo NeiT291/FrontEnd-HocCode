@@ -15,6 +15,27 @@ export interface ContestPageResponse {
   message: string;
   data: ContestPage;
 }
+export interface ContestRankingResponse{
+    code: number;
+  message: string;
+  data: ContestRankingPage;
+}
+export interface ContestRankingPage{
+    total_records: number;
+  total_records_page: number;
+  current_page: number;
+  total_pages: number;
+  prev_pages: number;
+  next_pages: number;
+  data: ContestRanking[];
+}
+export interface ContestRanking{
+    user: User;
+    totalScore: number;
+    solvedCount: number;
+    penalty: number;
+    lastAcceptedTime: string;
+}
 export interface ContestPage {
   total_records: number;
   total_records_page: number;

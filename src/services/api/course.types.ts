@@ -23,6 +23,15 @@ export interface CoursePageResponse {
   message: string;
   data: CoursePage;
 }
+export interface CourseProcessResponse {
+  code: number;
+  message: string;
+  data: CourseProcess[];
+}
+export interface CourseProcess{
+  problemId: number;
+  status: string;
+}
 export interface CoursePage {
   total_records: number;
   total_records_page: number;

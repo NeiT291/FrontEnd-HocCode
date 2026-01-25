@@ -11,7 +11,7 @@ import {
     Clock,
     Circle,
 } from "lucide-react";
-import { getCourseById, checkCourseJoined, enrollCourse, outCourse } from "@/services/api/course.service";
+import { getCourseById, checkCourseJoined, enrollCourse, outCourse, getCourseProcess } from "@/services/api/course.service";
 import type { Course, Module } from "@/services/api/course.types";
 import toast from "react-hot-toast";
 import type { Problem } from "@/services/api/problem.types";
@@ -28,6 +28,7 @@ export default function CourseDetailPage() {
     const [checkingJoin, setCheckingJoin] = useState(true);
     const [openModules, setOpenModules] = useState<number[]>([]);
     const joinRef = useRef<HTMLDivElement>(null);
+    const [processMap, setProcessMap] = useState<Record<number, LessonProgress>>({});
 
     useEffect(() => {
         if (Number.isNaN(courseId)) return;
@@ -45,7 +46,9 @@ export default function CourseDetailPage() {
 
             setCourse({
                 id: data.id,
-                thumbnailUrl: data.thumbnailUrl || "https://picsum.photos/600/400?random=" + data.id,
+                thumbnailUrl:
+                    data.thumbnailUrl ||
+                    "https://picsum.photos/600/400?random=" + data.id,
                 title: data.title,
                 description: data.description,
                 owner: data.owner,
@@ -55,14 +58,28 @@ export default function CourseDetailPage() {
                 modules,
             });
         });
+
         checkCourseJoined(courseId)
-            .then((data) => {
-                setJoined(Boolean(data));
+            .then(async (data) => {
+                const isJoined = Boolean(data);
+                setJoined(isJoined);
+
+                if (isJoined) {
+                    const processList = await getCourseProcess(courseId);
+
+                    const map: Record<number, LessonProgress> = {};
+                    processList.forEach((p) => {
+                        map[p.problemId] = mapProcessStatus(p.status);
+                    });
+
+                    setProcessMap(map);
+                }
             })
             .finally(() => {
                 setCheckingJoin(false);
             });
     }, [courseId]);
+
 
     const toggleModule = (moduleId: number) => {
         setOpenModules((prev) =>
@@ -109,7 +126,30 @@ export default function CourseDetailPage() {
             </div>
         );
     }
+    const totalProblems = course.modules.reduce(
+        (sum, m) => sum + m.problems.length,
+        0
+    );
 
+    const completedProblems = course.modules.reduce((sum, m) => {
+        return (
+            sum +
+            m.problems.filter(
+                (p) => processMap[p.id] === "completed"
+            ).length
+        );
+    }, 0);
+
+    const progressPercent =
+        totalProblems === 0
+            ? 0
+            : Math.round((completedProblems / totalProblems) * 100);
+    const progressColor =
+        progressPercent === 100
+            ? "bg-green-600"
+            : progressPercent >= 50
+                ? "bg-blue-600"
+                : "bg-yellow-500";
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
@@ -173,6 +213,25 @@ export default function CourseDetailPage() {
                                     </button>
                                 </span>
                             )}
+                            {!checkingJoin && joined && (
+                                <div className="mt-6 space-y-2">
+                                    {/* Text */}
+                                    <div className="flex justify-between text-sm text-gray-600">
+                                        <span>Tiến độ học tập</span>
+                                        <span>
+                                            {completedProblems}/{totalProblems} bài · {progressPercent}%
+                                        </span>
+                                    </div>
+
+                                    {/* Progress bar */}
+                                    <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full ${progressColor} transition-all duration-500`}
+                                            style={{ width: `${progressPercent}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -180,7 +239,7 @@ export default function CourseDetailPage() {
                 {/* ================= MODULES ================= */}
                 <section className="space-y-4">
                     {course.modules.map((module) => {
-                        const isOpen = openModules.includes(module.id);
+                        const isOpen = !openModules.includes(module.id);
 
                         return (
                             <div
@@ -220,7 +279,7 @@ export default function CourseDetailPage() {
                                                     position: p.position,
                                                     testcases: p.testcases,
                                                 }}
-                                                progress="not_started"
+                                                progress={processMap[p.id] ?? "not_started"}
                                                 moduleId={module.id}
                                                 courseId={course.id}
                                                 joined={joined}
@@ -336,5 +395,15 @@ function LessonProgressBadge({
                     Chưa học
                 </span>
             );
+    }
+}
+function mapProcessStatus(status?: string): LessonProgress {
+    switch (status) {
+        case "COMPLETED":
+            return "completed";
+        case "IN_PROGRESS":
+            return "in_progress";
+        default:
+            return "not_started";
     }
 }

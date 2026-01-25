@@ -277,7 +277,7 @@ export default function EditContestPage() {
                                     e.target.value
                                 )
                             }
-                            className="w-full mt-1 px-4 py-2.5 border rounded-xl resize-none"
+                            className="w-full mt-1 px-4 py-2.5 border rounded-xl"
                         />
 
                     </div>
@@ -397,6 +397,7 @@ export default function EditContestPage() {
             {editingProblem && (
                 <EditPracticeModal
                     practice={editingProblem}
+                    isPublic={false}
                     onClose={() => setEditingProblem(null)}
                     onSubmit={() => {
                         setEditingProblem(null);

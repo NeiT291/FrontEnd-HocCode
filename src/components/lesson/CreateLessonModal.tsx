@@ -72,7 +72,7 @@ function CreateLessonModal({
                 memoryLimitKb: type === "PRACTICE" ? memoryLimitKb : 0,
                 position: 0,
                 difficulty: "easy",
-                isPublic: true,
+                isPublic: false,
                 isTheory: type === "THEORY",
                 testcases:
                     type === "PRACTICE"

@@ -2,7 +2,8 @@ import CreatedCourseList from "@/components/profile/lists/CreatedCourseList";
 import JoinedCourseList from "@/components/profile/lists/JoinedCourseList";
 import CreatedContestList from "@/components/profile/lists/CreatedContestList";
 import CreatedPracticeList from "@/components/profile/lists/CreatedPracticeList";
-import JoinedContestList from "./lists/JoinedContestList";
+import JoinedContestList from "@/components/profile/lists/JoinedContestList";
+import JoinedPracticeList from "@/components/profile/lists/JoinedPracticeList";
 /* ================= TYPES ================= */
 
 type MainTab = "joined" | "created";
@@ -31,6 +32,9 @@ const ProfileContent = ({ mainTab, subTab }: Props) => {
     }
     if (mainTab === "joined" && subTab === "contest") {
         return <JoinedContestList />;
+    }
+    if (mainTab === "joined" && subTab === "practice") {
+        return <JoinedPracticeList />;
     }
 
     return (
