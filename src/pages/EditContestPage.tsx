@@ -95,8 +95,8 @@ export default function EditContestPage() {
     /* ================= SAVE ================= */
     const handleDeleteProblem = async (problemId: number) => {
         if (!confirm("Xóa vấn đề này?")) return;
-        await deleteProblem(problemId);
-        reloadContest();
+        deleteProblem(problemId);
+        window.location.reload();
     };
 
     const handleSave = async () => {

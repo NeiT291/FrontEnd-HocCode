@@ -81,24 +81,28 @@ export default function AdminDashboard() {
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
+                    link="/admin/courses"
                     icon={BookOpen}
                     label="Khóa học"
                     value={stats.totalCourse}
                     color="green"
                 />
                 <DashboardStatCard
+                    link="/admin/contests"
                     icon={Trophy}
                     label="Cuộc thi"
                     value={stats.totalContest}
                     color="purple"
                 />
                 <DashboardStatCard
+                    link="/admin/practices"
                     icon={Dumbbell}
                     label="Luyện tập"
                     value={stats.totalProblem}
                     color="orange"
                 />
                 <DashboardStatCard
+                    link="/admin/users"
                     icon={Users}
                     label="Người dùng"
                     value={stats.totalUser}

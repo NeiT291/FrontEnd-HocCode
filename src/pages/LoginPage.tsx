@@ -35,7 +35,6 @@ const LoginPage = () => {
         setFormError(null); // reset lỗi cũ
 
         try {
-            // 👉 CALL API LOGIN
             const res = await axiosInstance.post("/auth/login", {
                 username: data.username,
                 password: data.password,
@@ -47,7 +46,6 @@ const LoginPage = () => {
 
             const token = res.data.data.token;
 
-            // 👉 LƯU TOKEN
             localStorage.setItem("access_token", token);
             const userInfo = await getMyInfo();
             setUser(userInfo);
@@ -60,7 +58,7 @@ const LoginPage = () => {
 
         } catch (err: unknown) {
             if (err instanceof Error) {
-                setFormError(err.message);
+                setFormError("Tài khoản hoặc mật khẩu không đúng");
             } else {
                 setFormError("Đã xảy ra lỗi, vui lòng thử lại");
             }

@@ -25,7 +25,7 @@ export default function EditPracticeModal({
     onSubmit,
 }: Props) {
     /* ================= BASIC ================= */
-
+    console.log(practice)
     const [title, setTitle] = useState(practice.title);
     const [description, setDescription] = useState(
         practice.description ?? ""
@@ -60,7 +60,7 @@ export default function EditPracticeModal({
         setTestcases((prev) => [
             ...prev,
             {
-                id: 1,
+                id: -1,
                 input: "",
                 expectedOutput: "",
                 isSample: true,
@@ -98,7 +98,7 @@ export default function EditPracticeModal({
 
         try {
             setSubmitting(true);
-
+            console.log(practice);
             const updatedProblem = await modifyProblem({
                 id: practice.id,
                 title: title.trim(),
@@ -120,6 +120,7 @@ export default function EditPracticeModal({
             toast.success("Cập nhật bài luyện tập thành công");
             onSubmit?.(updatedProblem);
             onClose();
+            window.location.reload();
         } catch (error) {
             console.log(error)
             toast.error("Cập nhật thất bại, vui lòng thử lại");
@@ -136,7 +137,7 @@ export default function EditPracticeModal({
                 {/* HEADER */}
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">
-                        Chỉnh sửa bài luyện tập
+                        Chỉnh sửa
                     </h3>
                     <button
                         onClick={onClose}

@@ -10,7 +10,7 @@ import {
 } from "@/services/api/admin.service";
 
 import type { Problem } from "@/services/api/problem.types";
-import EditProblemModal from "@/components/admin/EditProblemModal";
+import EditProblemModal from "@/components/practice/EditPracticeModel";
 
 /* ================= CONSTANT ================= */
 
@@ -327,7 +327,8 @@ export default function AdminProblems() {
             )}
             {editingProblem && (
                 <EditProblemModal
-                    problem={editingProblem}
+                    practice={editingProblem}
+                    isPublic={true}
                     onClose={() => setEditingProblem(null)}
                     onSubmit={(data) => {
                         // TODO: call updateProblem API

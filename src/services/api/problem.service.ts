@@ -1,5 +1,6 @@
 import axiosInstance, { type ApiResponseNoData } from "@/services/api/axios";
 import type { ProblemPageResponse, ProblemResponse, ProblemRequest } from "@/services/api/problem.types";
+import toast from "react-hot-toast";
 
 export async function getAllProblems(
     page: number,
@@ -148,12 +149,18 @@ export async function modifyProblem(
 export async function deleteProblem(
     id: number
 ){
-    const res = await axiosInstance.delete<ApiResponseNoData>(
-        "/problems/delete-problem",
-        { params: { id } }
-    );
-    if (res.data.code !== 200) {
-        throw new Error(res.data.message || "Không xóa được problem");
+    try {
+        const res = await axiosInstance.delete<ApiResponseNoData>(
+            "/problems/delete-problem",
+            { params: { id } }
+        );
+        if (res.data.code !== 200) {
+            throw new Error(res.data.message || "Không xóa được problem");
+        }
+        
+    } catch (error) {
+        console.log(error)
+        toast.error("Không thể thực hiện hành động này")
     }
 }
 export async function getProblemsDone(

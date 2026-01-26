@@ -19,6 +19,7 @@ export default function ContestDetailPage() {
     const [joined, setJoined] = useState(false);
     const [checkingJoin, setCheckingJoin] = useState(true);
     const [enrolling, setEnrolling] = useState(false);
+
     useEffect(() => {
         if (!id) return;
 
@@ -26,13 +27,11 @@ export default function ContestDetailPage() {
 
         const fetchData = async () => {
             try {
-                const [contestData, isJoined] = await Promise.all([
-                    getContestById(contestId),
-                    checkContestJoined(contestId),
-                ]);
+                setContest(await getContestById(contestId));
+                if (localStorage.getItem("access_token") != null) {
+                    setJoined(Boolean(await checkContestJoined(contestId)));
+                }
 
-                setContest(contestData);
-                setJoined(Boolean(isJoined));
             } finally {
                 setLoading(false);
                 setCheckingJoin(false);

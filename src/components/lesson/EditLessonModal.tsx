@@ -36,14 +36,13 @@ function EditLessonModal({
             isSample: true,
         }))
     );
-
     /* ================= TESTCASE ================= */
 
     const addTestcase = () => {
         setTestcases((prev) => [
             ...prev,
             {
-                id: 1,
+                id: -1,
                 input: "",
                 expectedOutput: "",
                 position: 0,
@@ -64,10 +63,15 @@ function EditLessonModal({
         );
     };
 
-    const removeTestcase = (id: number) => {
+    const removeTestcase = async (id: number) => {
         console.log("testcaseid: " + id);
-        deleteTestcase(id);
-        setTestcases((prev) => prev.filter((tc) => tc.id !== id));
+        try {
+            await deleteTestcase(id);
+            setTestcases((prev) => prev.filter((tc) => tc.id !== id));
+        } catch (error) {
+            console.log(error)
+            toast.error("Không thể thực hiện hành động này")
+        }
     };
 
     /* ================= SUBMIT ================= */
@@ -84,6 +88,7 @@ function EditLessonModal({
                 testcases:
                     type === "PRACTICE"
                         ? testcases.map<Testcase>((tc, index) => ({
+                            id: tc.id,
                             input: tc.input,
                             isSample: true,
                             expectedOutput: tc.expectedOutput,
@@ -95,6 +100,7 @@ function EditLessonModal({
             toast.success("Cập nhật bài học thành công");
             onSuccess?.();
             onClose();
+            window.location.reload();
         } catch (error) {
             console.error(error);
             toast.error("Cập nhật bài học thất bại");

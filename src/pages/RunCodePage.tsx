@@ -1,16 +1,28 @@
-import { useState } from "react";
-import Editor from "@monaco-editor/react";
+import { useEffect, useState } from "react";
+import Editor, { useMonaco } from "@monaco-editor/react";
 import { Play, Terminal, Trash2 } from "lucide-react";
 
 import { runCodeApi } from "@/services/api/runcode.service";
 
+/* ================= TYPES ================= */
+
 type Language = "cpp" | "java" | "python";
+
+/* ================= CONSTANTS ================= */
 
 const LANGUAGE_MAP: Record<Language, number> = {
     cpp: 54,
     java: 62,
     python: 71,
 };
+
+const MONACO_LANGUAGE_MAP: Record<Language, string> = {
+    cpp: "cpp",
+    java: "java",
+    python: "python",
+};
+
+/* ================= PAGE ================= */
 
 export default function RunCodePage() {
     const [language, setLanguage] = useState<Language>("cpp");
@@ -19,10 +31,49 @@ export default function RunCodePage() {
 
     const [output, setOutput] = useState("");
     const [meta, setMeta] = useState("");
-    const [running, setRunning] = useState(false);
     const [error, setError] = useState("");
+    const [running, setRunning] = useState(false);
+
+    /* ===== SYNTAX CHECK ===== */
+    const monaco = useMonaco();
+    const [hasSyntaxError, setHasSyntaxError] = useState(false);
+    const [syntaxErrors, setSyntaxErrors] = useState<string[]>([]);
+
+    /* ================= SYNTAX MARKER LISTENER ================= */
+
+    useEffect(() => {
+        if (!monaco) return;
+        const model = monaco.editor.getModels()[0];
+        if (!model) return;
+
+        const checkMarkers = () => {
+            const markers = monaco.editor.getModelMarkers({
+                resource: model.uri,
+            });
+
+            const errors = markers.filter(
+                (m) => m.severity === monaco.MarkerSeverity.Error
+            );
+
+            setHasSyntaxError(errors.length > 0);
+            setSyntaxErrors(
+                errors.map(
+                    (e) => `Line ${e.startLineNumber}: ${e.message}`
+                )
+            );
+        };
+
+        checkMarkers();
+
+        const disposable = monaco.editor.onDidChangeMarkers(checkMarkers);
+        return () => disposable.dispose();
+    }, [monaco, language, code]);
+
+    /* ================= RUN ================= */
 
     const handleRun = async () => {
+        if (hasSyntaxError) return;
+
         setRunning(true);
         setOutput("");
         setError("");
@@ -46,12 +97,8 @@ export default function RunCodePage() {
             setMeta(
                 `Status: ${result.status} | Time: ${result.time ?? "-"} s | Memory: ${result.memory ?? "-"} KB`
             );
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("Run code error");
-            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Run code error");
         } finally {
             setRunning(false);
         }
@@ -63,11 +110,14 @@ export default function RunCodePage() {
         setMeta("");
     };
 
+    /* ================= RENDER ================= */
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-6 py-6">
                 <section className="bg-gray-700 rounded-2xl shadow-sm flex flex-col h-[620px]">
-                    {/* ================= TOOLBAR ================= */}
+
+                    {/* ===== TOOLBAR ===== */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-600">
                         <select
                             value={language}
@@ -75,6 +125,8 @@ export default function RunCodePage() {
                                 const lang = e.target.value as Language;
                                 setLanguage(lang);
                                 setCode(getTemplate(lang));
+                                setOutput("");
+                                setError("");
                             }}
                             className="bg-gray-800 text-white rounded px-3 py-2 text-sm"
                         >
@@ -85,17 +137,24 @@ export default function RunCodePage() {
 
                         <ActionButton
                             icon={<Play size={16} />}
-                            label={running ? "Running..." : "Run"}
+                            label={
+                                hasSyntaxError
+                                    ? "Fix syntax errors"
+                                    : running
+                                        ? "Running..."
+                                        : "Run"
+                            }
                             variant="primary"
-                            disabled={running}
+                            disabled={running || hasSyntaxError}
                             onClick={handleRun}
                         />
                     </div>
 
-                    {/* ================= EDITOR ================= */}
+                    {/* ===== EDITOR ===== */}
                     <div className="flex-1 overflow-hidden">
                         <Editor
-                            language={language}
+                            language={MONACO_LANGUAGE_MAP[language]}
+                            // language={"javascript"}
                             value={code}
                             onChange={(v) => setCode(v || "")}
                             theme="vs-dark"
@@ -108,7 +167,7 @@ export default function RunCodePage() {
                         />
                     </div>
 
-                    {/* ================= INPUT ================= */}
+                    {/* ===== INPUT ===== */}
                     <div className="border-t border-gray-600 bg-gray-800 px-4 py-3">
                         <label className="text-xs text-gray-300 mb-1 block">
                             Input (stdin)
@@ -118,11 +177,10 @@ export default function RunCodePage() {
                             onChange={(e) => setInput(e.target.value)}
                             rows={3}
                             className="w-full bg-gray-900 text-gray-100 rounded p-2 text-sm font-mono resize-none"
-                            placeholder="Ví dụ: 3 5"
                         />
                     </div>
 
-                    {/* ================= OUTPUT ================= */}
+                    {/* ===== OUTPUT ===== */}
                     <div className="border-t border-gray-600 bg-gray-900 text-gray-100">
                         <div className="flex items-center justify-between px-4 py-2 text-sm">
                             <div className="flex items-center gap-2">
@@ -140,6 +198,23 @@ export default function RunCodePage() {
                         </div>
 
                         <div className="px-4 pb-4 space-y-2 max-h-48 overflow-auto">
+
+                            {syntaxErrors.length > 0 && (
+                                <div className="bg-red-950 border border-red-700 rounded p-2">
+                                    <div className="text-xs font-semibold text-red-400 mb-1">
+                                        Syntax Errors
+                                    </div>
+                                    {syntaxErrors.map((e, i) => (
+                                        <div
+                                            key={i}
+                                            className="text-red-400 text-xs font-mono"
+                                        >
+                                            {e}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             {error && (
                                 <pre className="text-red-400 text-sm font-mono whitespace-pre-wrap">
                                     {error}

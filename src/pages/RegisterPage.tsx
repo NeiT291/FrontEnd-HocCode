@@ -6,6 +6,7 @@ import Input from "@/components/form/Input";
 import { useEffect, useState } from "react";
 import { registerUser } from "@/services/api/user.service";
 import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
 
 type RegisterForm = {
     username: string;
@@ -39,9 +40,9 @@ const RegisterPage = () => {
 
         try {
             if (data.password !== data.repassword) {
+                setFormError("Mật khẩu không khớp")
                 throw new Error("Mật khẩu không khớp");
             }
-
             await registerUser({
                 username: data.username,
                 password: data.password,
@@ -49,6 +50,7 @@ const RegisterPage = () => {
                 display_name: data.fullName,
                 email: data.email,
             });
+
             toast.success(
                 "Đăng ký thành công! Đang chuyển tới trang đăng nhập..."
             );
@@ -56,12 +58,15 @@ const RegisterPage = () => {
                 navigate("/login");
             }, 2000);
 
-        } catch (err: unknown) {
-            const message =
-                err instanceof Error
-                    ? err.message
-                    : "Đã xảy ra lỗi, vui lòng thử lại";
-            toast.error(message);
+
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+
+            if (error.response?.data?.message == "Username is invalid") {
+                setFormError("Username đã tồn tại")
+            } else if (error.response?.data?.message == "Email is invalid") {
+                setFormError("Email đã tồn tại")
+            };
         }
     };
 

@@ -1,6 +1,8 @@
 import type { LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
+    link: string;
     icon: LucideIcon;
     label: string;
     value: number | string;
@@ -16,13 +18,18 @@ const colorMap = {
 };
 
 export default function DashboardStatCard({
+    link,
     icon: Icon,
     label,
     value,
     color = "blue",
 }: Props) {
+    const nav = useNavigate();
+    const linkTo = () => {
+        nav(link)
+    }
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+        <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition" onClick={linkTo}>
             <div className="flex items-center gap-4">
                 {/* Icon */}
                 <div

@@ -15,7 +15,7 @@ export async function getMyInfo(): Promise<User> {
 
 export async function registerUser(
     payload: RegisterRequest
-): Promise<void> {
+) {
     const res = await axiosInstance.post<UserResponse>(
         "/users/register",
         payload
@@ -24,6 +24,7 @@ export async function registerUser(
     if (res.data.code !== 200) {
         throw new Error(res.data.message || "Đăng ký thất bại");
     }
+    return res.data
 }
 export async function updateMyProfile(payload: UpdateUserRequest) {
     const res = await axiosInstance.put(

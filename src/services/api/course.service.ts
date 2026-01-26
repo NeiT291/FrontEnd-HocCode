@@ -1,5 +1,6 @@
 import axiosInstance, { type ApiResponseNoData } from "@/services/api/axios";
 import type { CourseEnrollResponse, CourseModuleResponse, CoursePageResponse, CourseProcessResponse, CourseRequest, CourseResponse, ModuleRequest } from "@/services/api/course.types";
+import toast from "react-hot-toast";
 
 export async function getAllCourses(
   page: number,
@@ -204,25 +205,36 @@ export async function addCourseModule(
 export async function updateModule(
     payload: ModuleRequest
 ) {
-    const res = await axiosInstance.put<CourseModuleResponse>(
-        "/course-module/modify",
-        payload
-    );
-
-    if (res.data.code !== 200) {
+    try {
+        const res = await axiosInstance.put<CourseModuleResponse>(
+            "/course-module/modify",
+            payload
+        );
+        if (res.data.code !== 200) {
         throw new Error(res.data.message || "Sửa module thất bại");
     }
+    } catch (error) {
+        console.log(error);
+        toast.error("Không thể thực hiện hành động này!!!")
+    }
+
+    
 }
 
 export async function deleteModule(
     moduleId: number
 ){
-    const res = await axiosInstance.delete<ApiResponseNoData>(
-        "/course/delete-module",
-        { params: { moduleId } }
-    );
-    if (res.data.code !== 200) {
-        throw new Error(res.data.message || "Không xóa được module");
+    try {
+        const res = await axiosInstance.delete<ApiResponseNoData>(
+            "/course/delete-module",
+            { params: { moduleId } }
+        );
+        if (res.data.code !== 200) {
+            throw new Error(res.data.message || "Không xóa được module");
+        }
+    } catch (error) {
+        console.log(error);
+        toast.error("Không thể thực hiện hành động này!!!")
     }
 }
 export async function getCourseProcess(courseId: number) {
