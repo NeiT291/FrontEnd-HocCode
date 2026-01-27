@@ -91,7 +91,6 @@ export default function RunCodePage() {
             } else if (result.stderr) {
                 setError(result.stderr);
             }
-
             setOutput(result.stdout || "(Không có output)");
 
             setMeta(
